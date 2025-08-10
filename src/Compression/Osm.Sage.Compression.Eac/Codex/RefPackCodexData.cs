@@ -60,7 +60,7 @@ public partial class RefPackCodex : ICodex
     /// <c>true</c> if the buffer starts with a recognized RefPack signature; otherwise, <c>false</c>.
     /// </returns>
     /// <remarks>
-    /// Recognizes the following 32-bit big-endian signatures:
+    /// Recognizes the following 16-bit big-endian signatures:
     /// <list type="bullet">
     /// <item>0x10FB - Standard RefPack format</item>
     /// <item>0x11FB - RefPack with extended metadata</item>
@@ -76,7 +76,7 @@ public partial class RefPackCodex : ICodex
             return false;
         }
 
-        var packType = BinaryPrimitives.ReadInt32BigEndian(compressedData);
+        var packType = BinaryPrimitives.ReadUInt16BigEndian(compressedData);
         return packType is 0x10FB or 0x11FB or 0x90FB or 0x91FB;
     }
 
@@ -119,7 +119,7 @@ public partial class RefPackCodex : ICodex
             );
         }
 
-        var packType = BinaryPrimitives.ReadInt32BigEndian(compressedData);
+        var packType = BinaryPrimitives.ReadUInt16BigEndian(compressedData);
         var bytesToRead = (packType & 0x8000) != 0 ? 4 : 3;
         var offset = 2 + (((packType & 0x0100) != 0) ? bytesToRead : 0);
 
