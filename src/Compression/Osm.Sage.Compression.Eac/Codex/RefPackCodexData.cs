@@ -85,9 +85,6 @@ public partial class RefPackCodex : ICodex
     /// </summary>
     /// <param name="compressedData">The RefPack-compressed data buffer.</param>
     /// <returns>The expected size in bytes of the decompressed data.</returns>
-    /// <exception cref="NotSupportedException">
-    /// Thrown if this codex instance does not support decoding operations.
-    /// </exception>
     /// <exception cref="ArgumentException">
     /// Thrown if the data is invalid, unrecognized, or insufficient for size determination.
     /// </exception>
@@ -109,13 +106,6 @@ public partial class RefPackCodex : ICodex
     /// </remarks>
     public int GetSize(ReadOnlySpan<byte> compressedData)
     {
-        if (!About.Capabilities.CanDecode)
-        {
-            throw new NotSupportedException(
-                $"The codex {nameof(RefPackCodex)} does not support decoding."
-            );
-        }
-
         if (!IsValid(compressedData))
         {
             throw new ArgumentException("Invalid compressed data", nameof(compressedData));
