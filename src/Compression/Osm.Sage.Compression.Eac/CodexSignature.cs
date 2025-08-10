@@ -64,7 +64,14 @@ public sealed class CodexSignature : IEquatable<CodexSignature>
     public CodexSignature(string signature)
     {
         ArgumentNullException.ThrowIfNull(signature);
-        ArgumentOutOfRangeException.ThrowIfNotEqual(Ascii.IsValid(signature.AsSpan()), true);
+
+        if (!Ascii.IsValid(signature.AsSpan()))
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(signature),
+                $"{nameof(signature)} must contain only ASCII characters."
+            );
+        }
 
         Span<byte> bytes = stackalloc byte[4];
         bytes.Fill((byte)' ');
