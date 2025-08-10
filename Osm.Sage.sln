@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.GraphicsImportExport", "src\Osm.Sage.GraphicsImportExport\Osm.Sage.GraphicsImportExport.csproj", "{13287DBE-35DB-4B8D-802B-10E95FD5BDAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,6 +14,10 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13287DBE-35DB-4B8D-802B-10E95FD5BDAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13287DBE-35DB-4B8D-802B-10E95FD5BDAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13287DBE-35DB-4B8D-802B-10E95FD5BDAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13287DBE-35DB-4B8D-802B-10E95FD5BDAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
