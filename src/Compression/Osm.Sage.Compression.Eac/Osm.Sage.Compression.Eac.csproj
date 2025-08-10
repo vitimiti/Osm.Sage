@@ -3,6 +3,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Description>The EAC compression library for the Osm.Sage engine.</Description>
     <Version>0.2.0-alpha</Version>
   </PropertyGroup>
