@@ -94,7 +94,8 @@ public partial class BinaryTreeCodex
     /// </remarks>
     private sealed class CompressionContext
     {
-        #region Bit Packing State
+        // The bit Packing State
+
         /// <summary>
         /// The current number of bits accumulated in the bit buffer.
         /// </summary>
@@ -109,16 +110,16 @@ public partial class BinaryTreeCodex
         /// Total number of bytes written to the output stream.
         /// </summary>
         public uint OutputLength { get; set; }
-        #endregion
 
-        #region Bit Manipulation
+        // Bit Manipulation
+
         /// <summary>
         /// Precomputed bit masks for efficient bit field operations (masks[n] = 2^n-1).
         /// </summary>
         public readonly uint[] BitMasks = new uint[17];
-        #endregion
 
-        #region Node Classification Tables
+        // Node Classification Tables
+
         /// <summary>
         /// Node classification array where each byte's role is defined:
         /// 0 = normal byte, 1 = join left node, 2 = clue node, 3 = clue expansion.
@@ -134,9 +135,9 @@ public partial class BinaryTreeCodex
         /// Maps left join nodes to their replacement join node values.
         /// </summary>
         public readonly byte[] JoinNodes = new byte[MaxByteCodes];
-        #endregion
 
-        #region Working Data
+        // Working Data
+
         /// <summary>
         /// Reference to the input data being compressed.
         /// </summary>
@@ -146,9 +147,9 @@ public partial class BinaryTreeCodex
         /// Working span view of the current input data segment.
         /// </summary>
         public ReadOnlySpan<byte> InputSpan => InputData.Span;
-        #endregion
 
-        #region Double Buffering for Data Transformation
+        // Double Buffering for Data Transformation
+
         /// <summary>
         /// Primary working buffer for data transformation operations.
         /// </summary>
@@ -168,9 +169,9 @@ public partial class BinaryTreeCodex
         /// Currently inactive buffer segment for writing transformed data.
         /// </summary>
         public BufferSegment InactiveBuffer;
-        #endregion
 
-        #region Tree Building State
+        // Tree Building State
+
         /// <summary>
         /// Frequency analysis buffer for adjacent byte pair counting (64KB).
         /// </summary>
@@ -210,7 +211,6 @@ public partial class BinaryTreeCodex
         /// List of tree node definitions (parent, left child, right child).
         /// </summary>
         public List<(uint node, uint left, uint right)> TreeNodes { get; set; } = [];
-        #endregion
 
         /// <summary>
         /// Initializes a new compression context and sets up bit manipulation masks.
