@@ -57,13 +57,17 @@ public static class ByteUtilities
                 destination.Add((byte)value);
                 break;
             case 2:
-                destination.AddRange(BitConverter.GetBytes((ushort)value));
+                Span<byte> temp2 = stackalloc byte[2];
+                BinaryPrimitives.WriteUInt16BigEndian(temp2, (ushort)value);
+                destination.AddRange(temp2);
                 break;
             case 3:
                 destination.AddRange([(byte)(value >> 16), (byte)(value >> 8), (byte)value]);
                 break;
             default:
-                destination.AddRange(BitConverter.GetBytes(value));
+                Span<byte> temp4 = stackalloc byte[4];
+                BinaryPrimitives.WriteUInt32BigEndian(temp4, value);
+                destination.AddRange(temp4);
                 break;
         }
     }
