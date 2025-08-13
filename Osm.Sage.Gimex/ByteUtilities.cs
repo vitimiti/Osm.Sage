@@ -19,6 +19,9 @@ public static class ByteUtilities
         };
     }
 
+    public static uint GetBigEndianValue(this Span<byte> source, int byteCount = 1) =>
+        ((ReadOnlySpan<byte>)source).GetBigEndianValue(byteCount);
+
     public static void SetBigEndianValue(this Span<byte> destination, uint value, int byteCount = 1)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(byteCount, 1);
