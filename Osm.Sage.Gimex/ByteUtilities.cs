@@ -49,7 +49,11 @@ public static class ByteUtilities
         }
     }
 
-    public static void SetBigEndianValue(this List<byte> destination, uint value, int byteCount = 1)
+    public static void AppendBigEndianValue(
+        this List<byte> destination,
+        uint value,
+        int byteCount = 1
+    )
     {
         switch (byteCount)
         {
