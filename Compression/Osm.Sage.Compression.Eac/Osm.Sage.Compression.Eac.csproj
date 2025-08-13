@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Description>The EAC compression library for the Osm.Sage engine.</Description>
+    <Version>0.1.0-alpha</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(ProjectDir)/README.md" Pack="true" PackagePath="docs/README.md" />
+  </ItemGroup>
+  <Import Project="$(SolutionDir)/Targets/Osm.Sage.Common.targets" />
+  <Import Project="$(SolutionDir)/Targets/Osm.Sage.Package.targets" />
+</Project>
