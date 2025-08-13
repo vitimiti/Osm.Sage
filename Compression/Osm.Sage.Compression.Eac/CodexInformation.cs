@@ -8,6 +8,7 @@ public record CodexInformation()
 {
     public required Signature Signature { get; init; }
     public required CodexCapabilities Capabilities { get; init; }
+    public required Version Version { get; init; }
     public required string ShortType { get; init; }
     public required string LongType { get; init; }
 }
