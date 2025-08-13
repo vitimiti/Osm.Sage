@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Osm.Sage.Compression.Eac;
 
+[PublicAPI]
 public record CodexCapabilities()
 {
     public required bool CanDecode { get; init; }

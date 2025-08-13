@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Osm.Sage.Compression.Eac;
 
+[PublicAPI]
 public interface ICodex
 {
     CodexInformation About { get; }
