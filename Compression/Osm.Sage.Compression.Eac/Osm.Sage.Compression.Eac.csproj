@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>The EAC compression library for the Osm.Sage engine.</Description>
-    <Version>0.4.0-alpha</Version>
+    <Version>0.5.0-alpha</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(ProjectDir)/README.md" Pack="true" PackagePath="docs/README.md" />
