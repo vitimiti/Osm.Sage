@@ -48,4 +48,23 @@ public static class ByteUtilities
                 break;
         }
     }
+
+    public static void SetBigEndianValue(this List<byte> destination, uint value, int byteCount = 1)
+    {
+        switch (byteCount)
+        {
+            case 1:
+                destination.Add((byte)value);
+                break;
+            case 2:
+                destination.AddRange(BitConverter.GetBytes((ushort)value));
+                break;
+            case 3:
+                destination.AddRange([(byte)(value >> 16), (byte)(value >> 8), (byte)value]);
+                break;
+            default:
+                destination.AddRange(BitConverter.GetBytes(value));
+                break;
+        }
+    }
 }
