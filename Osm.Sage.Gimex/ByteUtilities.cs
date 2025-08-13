@@ -1,7 +1,9 @@
 using System.Buffers.Binary;
+using JetBrains.Annotations;
 
 namespace Osm.Sage.Gimex;
 
+[PublicAPI]
 public static class ByteUtilities
 {
     public static uint GetBigEndianValue(this ReadOnlySpan<byte> source, int byteCount = 1)

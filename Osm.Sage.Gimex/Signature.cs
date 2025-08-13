@@ -1,8 +1,10 @@
 using System.Buffers.Binary;
 using System.Text;
+using JetBrains.Annotations;
 
 namespace Osm.Sage.Gimex;
 
+[PublicAPI]
 public class Signature
 {
     public uint Value { get; }
