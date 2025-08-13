@@ -9,6 +9,6 @@ public interface ICodex
 
     bool IsValid(ReadOnlySpan<byte> compressedData);
     int ExtractSize(ReadOnlySpan<byte> compressedData);
-    ICollection<byte> Encode(ReadOnlyMemory<byte> uncompressedData);
-    ICollection<byte> Decode(ReadOnlyMemory<byte> compressedData);
+    ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData);
+    ICollection<byte> Decode(ReadOnlySpan<byte> compressedData);
 }
