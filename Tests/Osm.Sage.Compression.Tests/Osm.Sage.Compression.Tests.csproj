@@ -25,4 +25,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj" />
   </ItemGroup>
+  <Import Project="$(SolutionDir)\Targets\Osm.Sage.Common.targets" />
 </Project>

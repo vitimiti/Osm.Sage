@@ -20,8 +20,4 @@
       </PropertyGroup>
     </Otherwise>
   </Choose>
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.7" />
-  </ItemGroup>
 </Project>
