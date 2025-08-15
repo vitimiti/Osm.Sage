@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>The EAC compression library for the Osm.Sage engine.</Description>
-    <Version>0.8.24-alpha</Version>
+    <Version>0.9.0-alpha</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
