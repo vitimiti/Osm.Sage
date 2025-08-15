@@ -1,6 +1,6 @@
 <Project>
   <PropertyGroup>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+<!--    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>-->
     <Authors>Victor Matia &lt;vmatir@outlook.com&gt;</Authors>
     <PackageProjectUrl>https://github.com/vitimiti/Osm.Sage.git</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
