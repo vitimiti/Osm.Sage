@@ -2,5 +2,6 @@
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=btre/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=csharpier/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=csharpsquid/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=gimex/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=refpack/@EntryIndexedValue">True</s:Boolean>
 </wpf:ResourceDictionary>
