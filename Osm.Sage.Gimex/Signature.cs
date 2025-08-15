@@ -19,7 +19,7 @@ public class Signature
         Span<byte> bytes = stackalloc byte[4];
         bytes.Fill((byte)' ');
         Encoding.ASCII.GetBytes(value.AsSpan(0, int.Min(value.Length, 4)), bytes);
-        Value = bytes.GetBigEndianValue(bytes.Length);
+        Value = BinaryPrimitives.ReadUInt32BigEndian(bytes);
     }
 
     public IReadOnlyCollection<byte> ToBytes()
