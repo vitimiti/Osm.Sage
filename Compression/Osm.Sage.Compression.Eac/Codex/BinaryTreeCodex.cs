@@ -63,80 +63,12 @@ public class BinaryTreeCodex : ICodex
             );
         }
 
-        int node;
-        int i;
-        int nodes;
-        int clue;
-        int unpackedLength;
-        byte[] source = compressedData.ToArray();
-        int sourceIndex = 0;
-        sbyte clueValue;
-        uint type;
-        DecodingContext context = new();
+        DecodingContext context = new() { Source = compressedData.ToArray() };
 
-        type = BinaryPrimitives.ReadUInt16BigEndian(source);
-        sourceIndex += 2;
-
-        // (Skip nothing for 0x46FB)
-        if (type is 0x47FB) // Skip unpackedLength
-        {
-            sourceIndex += 3;
-        }
-
-        unpackedLength =
-            (source[sourceIndex] << 16)
-            | BinaryPrimitives.ReadUInt16BigEndian(source.AsSpan()[(sourceIndex + 1)..]);
-
-        sourceIndex += 3;
-        context.Destination.Capacity = unpackedLength;
-
-        Array.Clear(context.ClueTable); // 0 means a code is a leaf
-
-        clue = source[sourceIndex++];
-        context.ClueTable[clue] = 1; // Mark the clue as special
-
-        nodes = source[sourceIndex++];
-        for (i = 0; i < nodes; ++i)
-        {
-            node = source[sourceIndex++];
-            context.Left[node] = source[sourceIndex++];
-            context.Right[node] = source[sourceIndex++];
-            context.ClueTable[node] = -1;
-        }
-
-        while (sourceIndex < source.Length)
-        {
-            node = source[sourceIndex++];
-            clueValue = context.ClueTable[node];
-            if (clueValue == 0)
-            {
-                context.Destination.Add((byte)node);
-                ++context.DestinationIndex;
-                continue;
-            }
-
-            if (clueValue < 0)
-            {
-                Chase(ref context, context.Left[node]);
-                Chase(ref context, context.Right[node]);
-                continue;
-            }
-
-            if (sourceIndex >= source.Length)
-            {
-                break;
-            }
-
-            node = source[sourceIndex++];
-            if (node != 0)
-            {
-                context.Destination.Add((byte)node);
-                ++context.DestinationIndex;
-                continue;
-            }
-
-            break;
-        }
+        PopulateSize(ref context);
+        InitializeClueTable(ref context);
+        ProcessNodes(ref context);
+        TraverseFile(ref context);
 
         return context.Destination;
     }
@@ -145,11 +77,14 @@ public class BinaryTreeCodex : ICodex
 
     private struct DecodingContext()
     {
+        public byte[] Source { get; init; }
+        public int SourceIndex { get; set; }
+        public List<byte> Destination { get; } = [];
+        public int DestinationIndex { get; set; }
         public sbyte[] ClueTable { get; } = new sbyte[256];
         public byte[] Left { get; } = new byte[256];
         public byte[] Right { get; } = new byte[256];
-        public List<byte> Destination { get; } = [];
-        public int DestinationIndex { get; set; }
+        public int Node { get; set; }
     }
 
     private static void Chase(ref DecodingContext context, byte node)
@@ -177,6 +112,81 @@ public class BinaryTreeCodex : ICodex
                     break;
             }
             // If ClueTable[currentNode] > 0, it's the special clue node, skip it
+        }
+    }
+
+    private static void PopulateSize(ref DecodingContext context)
+    {
+        uint type = BinaryPrimitives.ReadUInt16BigEndian(context.Source);
+        context.SourceIndex += 2;
+
+        // (Skip nothing for 0x46FB)
+        if (type is 0x47FB) // Skip unpackedLength
+        {
+            context.SourceIndex += 3;
+        }
+
+        int unpackedLength =
+            (context.Source[context.SourceIndex] << 16)
+            | BinaryPrimitives.ReadUInt16BigEndian(
+                context.Source.AsSpan()[(context.SourceIndex + 1)..]
+            );
+
+        context.SourceIndex += 3;
+        context.Destination.Capacity = unpackedLength;
+    }
+
+    private static void InitializeClueTable(ref DecodingContext context)
+    {
+        Array.Clear(context.ClueTable); // 0 means a code is a leaf
+        var clue = context.Source[context.SourceIndex++];
+        context.ClueTable[clue] = 1; // Mark the clue as special
+    }
+
+    private static void ProcessNodes(ref DecodingContext context)
+    {
+        var nodes = context.Source[context.SourceIndex++];
+        for (var i = 0; i < nodes; ++i)
+        {
+            context.Node = context.Source[context.SourceIndex++];
+            context.Left[context.Node] = context.Source[context.SourceIndex++];
+            context.Right[context.Node] = context.Source[context.SourceIndex++];
+            context.ClueTable[context.Node] = -1;
+        }
+    }
+
+    private static void TraverseFile(ref DecodingContext context)
+    {
+        while (context.SourceIndex < context.Source.Length)
+        {
+            context.Node = context.Source[context.SourceIndex++];
+            sbyte clueValue = context.ClueTable[context.Node];
+            switch (clueValue)
+            {
+                case 0:
+                    context.Destination.Add((byte)context.Node);
+                    ++context.DestinationIndex;
+                    continue;
+                case < 0:
+                    Chase(ref context, context.Left[context.Node]);
+                    Chase(ref context, context.Right[context.Node]);
+                    continue;
+            }
+
+            if (context.SourceIndex >= context.Source.Length)
+            {
+                break;
+            }
+
+            context.Node = context.Source[context.SourceIndex++];
+            if (context.Node != 0)
+            {
+                context.Destination.Add((byte)context.Node);
+                ++context.DestinationIndex;
+                continue;
+            }
+
+            break;
         }
     }
 

@@ -4,15 +4,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>The EAC compression library for the Osm.Sage engine.</Description>
-    <Version>0.9.1-alpha</Version>
+    <Version>0.9.2-alpha</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(ProjectDir)/README.md" Pack="true" PackagePath="docs/README.md" />
+    <None Include="$(ProjectDir)\README.md" Pack="true" PackagePath="docs\README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Osm.Sage.Gimex\Osm.Sage.Gimex.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)/Targets/Osm.Sage.Common.targets" />
-  <Import Project="$(SolutionDir)/Targets/Osm.Sage.Package.targets" />
+  <Import Project="$(SolutionDir)\Targets\Osm.Sage.Common.targets" />
+  <Import Project="$(SolutionDir)\Targets\Osm.Sage.Package.targets" />
 </Project>

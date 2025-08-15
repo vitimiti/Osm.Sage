@@ -7,11 +7,11 @@
     <RepositoryUrl>https://github.com/vitimiti/Osm.Sage.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <PackageOutputPath>$(SolutionDir)/Packages</PackageOutputPath>
-    <PackageReadmeFile>docs/README.md</PackageReadmeFile>
+    <PackageOutputPath>$(SolutionDir)\Packages</PackageOutputPath>
+    <PackageReadmeFile>docs\README.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(SolutionDir)/CODE_OF_CONDUCT.md" Pack="true" PackagePath="docs/CODE_OF_CONDUCT.md"/>
-    <None Include="$(SolutionDir)/LICENSE.md" Pack="true" PackagePath="docs/LICENSE.md" />
+    <None Include="$(SolutionDir)\CODE_OF_CONDUCT.md" Pack="true" PackagePath="docs\CODE_OF_CONDUCT.md"/>
+    <None Include="$(SolutionDir)\LICENSE.md" Pack="true" PackagePath="docs\LICENSE.md" />
   </ItemGroup>
 </Project>
