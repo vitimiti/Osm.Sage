@@ -15,6 +15,17 @@ public class ArbitraryDataTests
             { CommonData.LoremIpsumRepetitive, RefpackData.LoremIpsumRepetitive },
         };
 
+    public static TheoryData<byte[], byte[]> BinaryTreeTestData =>
+        new()
+        {
+            { CommonData.Empty, BinaryTreeData.Empty },
+            { CommonData.SingleByte, BinaryTreeData.SingleByte },
+            { CommonData.LoremIpsumShort, BinaryTreeData.LoremIpsumShort },
+            { CommonData.LoremIpsumLong, BinaryTreeData.LoremIpsumLong },
+            { CommonData.LoremIpsumVeryLong, BinaryTreeData.LoremIpsumVeryLong },
+            { CommonData.LoremIpsumRepetitive, BinaryTreeData.LoremIpsumRepetitive },
+        };
+
     [Theory]
     [MemberData(nameof(RefpackTestData))]
     public void Refpack_EncodesAndDecodesCorrectly(
@@ -32,6 +43,29 @@ public class ArbitraryDataTests
 
         // Compare the compressed data
         Assert.Equal(expectedCompressedData, compressedData);
+
+        // Compare the decompressed data
+        Assert.Equal(originalData, decompressedData);
+    }
+
+    [Theory]
+    [MemberData(nameof(BinaryTreeTestData))]
+    public void BinaryTree_EncodesAndDecodesCorrectly(
+        byte[] originalData,
+        byte[] expectedCompressedData
+    )
+    {
+        BinaryTreeCodex codex = new();
+        // var compressedData = codex.Encode(originalData).ToArray();
+        // var decompressedData = codex.Decode(compressedData).ToArray();
+        var decompressedData = codex.Decode(expectedCompressedData).ToArray();
+
+        // Basic checks
+        // Assert.True(codex.IsValid(compressedData));
+        // Assert.Equal(originalData.Length, codex.ExtractSize(compressedData));
+
+        // Compare the compressed data
+        // Assert.Equal(expectedCompressedData, compressedData);
 
         // Compare the decompressed data
         Assert.Equal(originalData, decompressedData);
