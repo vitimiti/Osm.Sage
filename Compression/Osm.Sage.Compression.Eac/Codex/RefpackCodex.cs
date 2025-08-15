@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using JetBrains.Annotations;
 using Osm.Sage.Gimex;
 
@@ -21,11 +22,17 @@ public class RefpackCodex : ICodex
             LongType = "Refpack",
         };
 
+    public bool QuickEncoding { get; set; }
+
     public bool IsValid(ReadOnlySpan<byte> compressedData) =>
         compressedData.Length switch
         {
             < 2 => false,
-            _ => compressedData.GetBigEndianValue(2) is 0x10FB or 0x11FB or 0x90FB or 0x91FB,
+            _ => BinaryPrimitives.ReadUInt16BigEndian(compressedData)
+                is 0x10FB
+                    or 0x11FB
+                    or 0x90FB
+                    or 0x91FB,
         };
 
     public int ExtractSize(ReadOnlySpan<byte> compressedData)
@@ -40,26 +47,38 @@ public class RefpackCodex : ICodex
 
         ArgumentOutOfRangeException.ThrowIfLessThan(compressedData.Length, 2);
 
-        var packType = compressedData.GetBigEndianValue(2);
+        var packType = BinaryPrimitives.ReadUInt16BigEndian(compressedData);
         var byteCount = (packType & 0x8000) != 0 ? 4 : 3;
         var offset = (packType & 0x0100) != 0 ? 2 + byteCount : 2;
 
         ArgumentOutOfRangeException.ThrowIfLessThan(compressedData.Length, offset + byteCount);
 
-        return (int)compressedData[offset..].GetBigEndianValue(byteCount);
+        // 3 or 4 bytes
+        return byteCount switch
+        {
+            4 => (int)BinaryPrimitives.ReadUInt32BigEndian(compressedData[offset..]),
+            _ => compressedData[offset] << 16
+                | BinaryPrimitives.ReadUInt16BigEndian(compressedData[(offset + 1)..]),
+        };
     }
 
     public ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData)
     {
-        if (uncompressedData.IsEmpty)
+        EncodingContext context = new()
         {
-            throw new ArgumentException("The data to encode is empty", nameof(uncompressedData));
-        }
+            Source = uncompressedData.IsEmpty ? [] : uncompressedData.ToArray(),
+        };
 
-        var context = new EncodeContext { Source = uncompressedData.ToArray() };
+        PopulateSize(ref context);
 
-        WriteHeader(ref context);
-        CompressData(ref context);
+        context.LoopLength = (uncompressedData.IsEmpty ? 0 : context.Source.Length) - 4;
+        context.CurrentIndex = 0;
+        context.ReferenceIndex = 0;
+        context.Run = 0;
+
+        Array.Fill(context.HashTable, -1);
+
+        TraverseFile(ref context);
 
         return context.Destination;
     }
@@ -74,505 +93,542 @@ public class RefpackCodex : ICodex
             );
         }
 
-        try
+        DecodingContext context = new()
         {
-            var context = new DecodeContext
-            {
-                Source = compressedData.ToArray(),
-                ExpectedOutputSize = ExtractSize(compressedData),
-            };
+            Source = compressedData.IsEmpty ? [] : compressedData.ToArray(),
+        };
 
-            InitializeDecodeContext(ref context);
-            ProcessCompressionStream(ref context);
+        PopulateDestinationSize(ref context);
+        TraverseFile(ref context);
 
-            return context.Destination;
-        }
-        catch (Exception exception)
-            when (exception is ArgumentException or ArgumentOutOfRangeException)
-        {
-            throw new ArgumentException(
-                $"The data is not a valid {nameof(RefpackCodex)}",
-                nameof(compressedData),
-                exception
-            );
-        }
+        return context.Destination;
     }
 
-    #region Encoding Support
+    #region Encoding Utilities
 
-    private struct EncodeContext()
+    struct EncodingContext()
     {
-        private const int TableSize = 65536;
-
         public byte[] Source { get; init; }
         public List<byte> Destination { get; } = [];
-        public int InputPosition { get; set; }
-        public int OutputPosition { get; set; }
-        public int LiteralRunStart { get; set; }
-        public int LiteralRunLength { get; set; }
-        public int[] HashTable { get; } = new int[TableSize];
-        public int[] LinkTable { get; } = new int[TableSize];
+        public int[] HashTable { get; } = new int[65536];
+        public int[] Link { get; } = new int[131072];
+        public int Run { get; set; }
+        public int MaxBack { get; } = 131071;
+        public int CurrentIndex { get; set; }
+        public int ReferenceIndex { get; set; }
+        public int LoopLength { get; set; }
+        public int BinaryOffset { get; set; }
+        public int BinaryLength { get; set; }
+        public int BinaryCost { get; set; }
+        public int MaxLength { get; set; }
+        public int HashValue { get; set; }
+        public int HashOffset { get; set; }
+        public int MinimumHashOffset { get; set; }
     }
 
-    private ref struct MatchInfo
+    private static int Hash(ReadOnlySpan<byte> data, int offset)
     {
-        public int Distance { get; init; }
-        public int Length { get; init; }
-        public int Cost { get; init; }
-    }
-
-    private static void WriteHeader(ref EncodeContext context)
-    {
-        var sourceSize = context.Source.Length;
-        if (sourceSize > 0xFFFFFF)
-        {
-            // 4-byte size header
-            context.Destination.AppendBigEndianValue(0x90FB, 2);
-            context.Destination.AppendBigEndianValue((uint)sourceSize, 4);
-            context.InputPosition = 6;
-        }
-        else
-        {
-            // 3-byte size header
-            context.Destination.AppendBigEndianValue(0x10FB, 2);
-            context.Destination.AppendBigEndianValue((uint)sourceSize, 3);
-            context.InputPosition = 5;
-        }
-    }
-
-    private static int CalculateHash(ReadOnlySpan<byte> data, int position)
-    {
-        if (position + 2 >= data.Length)
+        if (offset + 2 >= data.Length)
         {
             return 0;
         }
 
-        return (data[position] << 8 | data[position + 2]) ^ (data[position + 1] << 4);
+        return ((data[offset] << 8) | data[offset + 2]) ^ (data[offset + 1] << 4);
     }
 
-    private static void InitializeHashTables(ref EncodeContext context)
-    {
-        Array.Fill(context.HashTable, -1);
-        Array.Fill(context.LinkTable, -1);
-    }
-
-    private static void AddToHashTable(ref EncodeContext context, int position)
-    {
-        if (position + 2 >= context.Source.Length)
-        {
-            return;
-        }
-
-        var hash = CalculateHash(context.Source, position);
-        var hashIndex = hash & (context.HashTable.Length - 1);
-        var linkIndex = position & (context.LinkTable.Length - 1);
-
-        context.LinkTable[linkIndex] = context.HashTable[hashIndex];
-        context.HashTable[hashIndex] = position;
-    }
-
-    private static MatchInfo FindBestMatch(ref EncodeContext context)
-    {
-        if (context.InputPosition + 2 >= context.Source.Length)
-        {
-            return new MatchInfo
-            {
-                Distance = 0,
-                Length = 0,
-                Cost = 0,
-            };
-        }
-
-        var hash = CalculateHash(context.Source, context.InputPosition);
-        var hashIndex = hash & (context.HashTable.Length - 1);
-        var hashPosition = context.HashTable[hashIndex];
-
-        var minPosition = context.InputPosition >= 131071 ? context.InputPosition - 131071 : 0;
-        var bestMatch = new MatchInfo
-        {
-            Distance = 0,
-            Length = 0,
-            Cost = 0,
-        };
-
-        var maxMatchLength = int.Min(context.Source.Length - context.InputPosition, 1028);
-
-        while (hashPosition >= minPosition && hashPosition >= 0)
-        {
-            var matchPosition = hashPosition;
-            var rawDistance = (context.InputPosition - 1) - matchPosition;
-            var matchLength = CalculateMatchLength(ref context, matchPosition, maxMatchLength);
-            if (matchLength > bestMatch.Length)
-            {
-                var cost = CalculateCommandCost(rawDistance, matchLength);
-                var benefit = matchLength - cost + 4;
-                if (benefit > bestMatch.Length - bestMatch.Cost + 4)
-                {
-                    bestMatch = new MatchInfo
-                    {
-                        Distance = rawDistance,
-                        Length = matchLength,
-                        Cost = cost,
-                    };
-
-                    if (matchLength >= 1028)
-                    {
-                        break;
-                    }
-                }
-            }
-
-            hashPosition = context.LinkTable[matchPosition & (context.LinkTable.Length - 1)];
-        }
-
-        return bestMatch;
-    }
-
-    private static int CalculateMatchLength(
-        ref EncodeContext context,
-        int matchPosition,
-        int maxMatchLength
+    private static int MatchLen(
+        byte[] source,
+        int sourceOffset,
+        byte[] dest,
+        int destOffset,
+        int maxMatch
     )
     {
-        var currentPosition = context.InputPosition;
-        var length = 0;
+        int current = 0;
+
         while (
-            length < maxMatchLength
-            && context.Source[currentPosition + length] == context.Source[matchPosition + length]
+            current < maxMatch
+            && sourceOffset + current < source.Length
+            && destOffset + current < dest.Length
+            && source[sourceOffset + current] == dest[destOffset + current]
         )
         {
-            ++length;
+            current++;
         }
 
-        return length;
+        return current;
     }
 
-    private static int CalculateCommandCost(int rawDistance, int matchLength) =>
-        rawDistance switch
-        {
-            < 1024 when matchLength <= 10 => 2, // Short form
-            < 16384 when matchLength <= 67 => 3, // Intermediate form
-            _ => 4, // Long form
-        };
-
-    private static bool ShouldUseMatch(MatchInfo match) =>
-        match.Length >= 3 && match.Cost < match.Length;
-
-    private static void FlushLiteralRuns(ref EncodeContext context)
+    private static void PopulateSize(ref EncodingContext context)
     {
-        while (context.LiteralRunLength > 3)
+        var header = (ushort)(context.Source.Length > 0xFFFFFF ? 0x90FB : 0x10FB);
+        Span<byte> headerBytes = stackalloc byte[2];
+        BinaryPrimitives.WriteUInt16BigEndian(headerBytes, header);
+        context.Destination.AddRange(headerBytes);
+
+        Span<byte> size =
+            context.Source.Length > 0xFFFFFF ? stackalloc byte[4] : stackalloc byte[3];
+
+        if (context.Source.Length > 0xFFFFFF)
         {
-            var chunkSize = int.Min(context.LiteralRunLength & ~3, 112);
-            WriteLiteralCommand(ref context, chunkSize);
-            context.LiteralRunLength -= chunkSize;
-            context.LiteralRunStart += chunkSize;
+            BinaryPrimitives.WriteUInt32BigEndian(size, (uint)context.Source.Length);
         }
-    }
-
-    private static void WriteLiteralCommand(ref EncodeContext context, int length)
-    {
-        var command = unchecked((byte)(0xE0 + (length >> 2) - 1));
-        context.Destination.Add(command);
-        context.OutputPosition++;
-
-        var literalData = context.Source.AsSpan().Slice(context.LiteralRunStart, length);
-        context.Destination.AddRange(literalData);
-        context.OutputPosition += length;
-    }
-
-    private static void EncodeMatchCommand(ref EncodeContext context, MatchInfo match)
-    {
-        var embeddedLiterals = context.LiteralRunLength;
-        switch (match.Cost)
+        else
         {
-            case 2:
-                WriteShortMatch(ref context, match, embeddedLiterals);
-                break;
-            case 3:
-                WriteIntermediateMatch(ref context, match, embeddedLiterals);
-                break;
-            default:
-                WriteLongMatch(ref context, match, embeddedLiterals);
-                break;
+            size[0] = (byte)(context.Source.Length >> 16);
+            BinaryPrimitives.WriteUInt16BigEndian(size[1..], (ushort)context.Source.Length);
         }
 
-        // Copy embedded literal bytes
-        if (embeddedLiterals > 0)
-        {
-            var literalData = context
-                .Source.AsSpan()
-                .Slice(context.LiteralRunStart, embeddedLiterals);
-
-            context.Destination.AddRange(literalData);
-            context.OutputPosition += embeddedLiterals;
-        }
-
-        context.LiteralRunLength = 0;
+        context.Destination.AddRange(size);
     }
 
-    private static void WriteShortMatch(
-        ref EncodeContext context,
-        MatchInfo match,
-        int literalCount
-    )
+    private static void InitializeTraversal(ref EncodingContext context)
     {
-        var command = (byte)(
-            ((match.Distance >> 8) << 5) + ((match.Length - 3) << 2) + literalCount
-        );
-        var secondByte = (byte)match.Distance;
-
-        context.Destination.Add(command);
-        context.Destination.Add(secondByte);
-        context.OutputPosition += 2;
+        context.BinaryOffset = 0;
+        context.BinaryLength = 2;
+        context.BinaryCost = 2;
+        context.MaxLength = int.Min(context.LoopLength, 1028);
+        context.HashValue = Hash(context.Source, context.CurrentIndex);
+        context.HashOffset = context.HashTable[context.HashValue];
+        context.MinimumHashOffset = int.Max(context.CurrentIndex - context.MaxBack, 0);
     }
 
-    private static void WriteIntermediateMatch(
-        ref EncodeContext context,
-        MatchInfo match,
-        int literalCount
-    )
+    private static void ProcessLargeHashOffset(ref EncodingContext context)
     {
-        var command = (byte)(0x80 + (match.Length - 4));
-        var secondByte = (byte)((literalCount << 6) + (match.Distance >> 8));
-        var thirdByte = (byte)match.Distance;
-
-        context.Destination.Add(command);
-        context.Destination.Add(secondByte);
-        context.Destination.Add(thirdByte);
-        context.OutputPosition += 3;
-    }
-
-    private static void WriteLongMatch(ref EncodeContext context, MatchInfo match, int literalCount)
-    {
-        var lengthPruned = match.Length - 5;
-        var command = (byte)(
-            0xC0 + ((match.Distance >> 16) << 4) + ((lengthPruned >> 8) << 2) + literalCount
-        );
-
-        var secondByte = (byte)(match.Distance >> 8);
-        var thirdByte = (byte)(match.Distance);
-        var fourthByte = (byte)(lengthPruned);
-
-        context.Destination.Add(command);
-        context.Destination.Add(secondByte);
-        context.Destination.Add(thirdByte);
-        context.Destination.Add(fourthByte);
-        context.OutputPosition += 4;
-    }
-
-    private static void AdvanceAfterMatch(ref EncodeContext context, MatchInfo match)
-    {
-        // Add all positions in the match to the hash table for better compression
-        for (var i = 0; i < match.Length; ++i)
-        {
-            AddToHashTable(ref context, context.InputPosition + i);
-        }
-
-        context.InputPosition += match.Length;
-        context.LiteralRunStart = context.InputPosition;
-    }
-
-    private static void WriteEndOfStream(ref EncodeContext context)
-    {
-        var finalLiterals = context.LiteralRunLength;
-        var command = (byte)(0xFC + finalLiterals);
-        context.Destination.Add(command);
-        context.OutputPosition++;
-
-        if (finalLiterals <= 0)
+        if (context.HashOffset < context.MinimumHashOffset)
         {
             return;
         }
 
-        var literalData = context.Source.AsSpan().Slice(context.LiteralRunStart, finalLiterals);
-        context.Destination.AddRange(literalData);
-        context.OutputPosition += finalLiterals;
+        do
+        {
+            if (
+                context.CurrentIndex + context.BinaryLength >= context.Source.Length
+                || context.HashOffset + context.BinaryLength >= context.Source.Length
+                || context.Source[context.CurrentIndex + context.BinaryLength]
+                    != context.Source[context.HashOffset + context.BinaryLength]
+            )
+            {
+                continue;
+            }
+
+            var tempLength = MatchLen(
+                context.Source,
+                context.CurrentIndex,
+                context.Source,
+                context.HashOffset,
+                context.MaxLength
+            );
+
+            if (tempLength <= context.BinaryLength)
+            {
+                continue;
+            }
+
+            int tempOffset = (context.CurrentIndex - 1) - context.HashOffset;
+
+            int tempCost = tempOffset switch
+            {
+                < 1024 when tempLength <= 10 => 2, // 2-byte int form
+                < 16384 when tempLength <= 67 => 3, // 3-byte int form
+                _ => 4, // 4-byte very int form
+            };
+
+            if (tempLength - tempCost + 4 <= context.BinaryLength - context.BinaryCost + 4)
+            {
+                continue;
+            }
+
+            context.BinaryLength = tempLength;
+            context.BinaryCost = tempCost;
+            context.BinaryOffset = tempOffset;
+            if (context.BinaryLength >= 1028)
+            {
+                break;
+            }
+        } while (
+            (context.HashOffset = context.Link[context.HashOffset & 131071])
+            >= context.MinimumHashOffset
+        );
     }
 
-    private static void CompressData(ref EncodeContext context)
+    private static void ProcessLargeCost(ref EncodingContext context)
     {
-        InitializeHashTables(ref context);
+        context.HashOffset = context.CurrentIndex;
+        context.Link[context.HashOffset & 131071] = context.HashTable[context.HashValue];
+        context.HashTable[context.HashValue] = context.HashOffset;
 
-        context.InputPosition = 0;
-        context.LiteralRunStart = 0;
-        context.LiteralRunLength = 0;
+        context.Run++;
+        context.CurrentIndex++;
+        context.LoopLength--;
+    }
 
-        var maxPosition = context.Source.Length >= 4 ? context.Source.Length - 4 : 0;
-        while (context.InputPosition < maxPosition)
+    private static void ProcessCostRelatedLiteralData(ref EncodingContext context)
+    {
+        while (context.Run > 3) // literal block of data
         {
-            var bestMatch = FindBestMatch(ref context);
-            if (ShouldUseMatch(bestMatch))
+            var tempLength = int.Min(112, context.Run & ~3);
+            context.Run -= tempLength;
+            context.Destination.Add((byte)(0xe0 + (tempLength >> 2) - 1));
+
+            for (int i = 0; i < tempLength; i++)
             {
-                FlushLiteralRuns(ref context);
-                EncodeMatchCommand(ref context, bestMatch);
-                AdvanceAfterMatch(ref context, bestMatch);
+                context.Destination.Add(context.Source[context.ReferenceIndex + i]);
+            }
+
+            context.ReferenceIndex += tempLength;
+        }
+    }
+
+    private static void ProcessCostRelated2ByteIntForm(ref EncodingContext context)
+    {
+        context.Destination.Add(
+            (byte)(
+                ((context.BinaryOffset >> 8) << 5) + ((context.BinaryLength - 3) << 2) + context.Run
+            )
+        );
+
+        context.Destination.Add((byte)context.BinaryOffset);
+    }
+
+    private static void ProcessCostRelated3ByteIntForm(ref EncodingContext context)
+    {
+        context.Destination.Add((byte)(0x80 + (context.BinaryLength - 4)));
+        context.Destination.Add((byte)((context.Run << 6) + (context.BinaryOffset >> 8)));
+        context.Destination.Add((byte)context.BinaryOffset);
+    }
+
+    private static void ProcessCostRelated4ByteVeryIntForm(ref EncodingContext context)
+    {
+        context.Destination.Add(
+            (byte)(
+                0xc0
+                + ((context.BinaryOffset >> 16) << 4)
+                + (((context.BinaryLength - 5) >> 8) << 2)
+                + context.Run
+            )
+        );
+
+        context.Destination.Add((byte)(context.BinaryOffset >> 8));
+        context.Destination.Add((byte)(context.BinaryOffset));
+        context.Destination.Add((byte)(context.BinaryLength - 5));
+    }
+
+    private static void ProcessCostRelatedFormData(ref EncodingContext context)
+    {
+        switch (context.BinaryCost)
+        {
+            // 2-byte int form
+            case 2:
+                ProcessCostRelated2ByteIntForm(ref context);
+                break;
+            // 3-byte int form
+            case 3:
+                ProcessCostRelated3ByteIntForm(ref context);
+                break;
+            // 4-byte very int form
+            default:
+                ProcessCostRelated4ByteVeryIntForm(ref context);
+                break;
+        }
+    }
+
+    private static void ProcessCostRelatedLiteralRun(ref EncodingContext context)
+    {
+        for (int i = 0; i < context.Run; i++)
+        {
+            context.Destination.Add(context.Source[context.ReferenceIndex + i]);
+        }
+
+        context.Run = 0;
+    }
+
+    private static void ProcessQuickEncoding(ref EncodingContext context)
+    {
+        context.HashOffset = context.CurrentIndex;
+        context.Link[context.HashOffset & 131071] = context.HashTable[context.HashValue];
+        context.HashTable[context.HashValue] = context.HashOffset;
+    }
+
+    private static void ProcessSlowEncoding(ref EncodingContext context)
+    {
+        for (int i = 0; i < context.BinaryLength; i++)
+        {
+            if (context.CurrentIndex + i >= context.Source.Length - 2)
+            {
+                continue;
+            }
+
+            context.HashValue = Hash(context.Source, context.CurrentIndex + i);
+            context.HashOffset = context.CurrentIndex + i;
+            context.Link[context.HashOffset & 131071] = context.HashTable[context.HashValue];
+            context.HashTable[context.HashValue] = context.HashOffset;
+        }
+    }
+
+    private static void TraverseSecondaryLoop(ref EncodingContext context)
+    {
+        context.LoopLength += 4;
+        context.Run += context.LoopLength;
+
+        while (context.Run > 3) // No match at the end, use literal
+        {
+            var tempLength = int.Min(112, context.Run & ~3);
+            context.Run -= tempLength;
+            context.Destination.Add((byte)(0xE0 + (tempLength >> 2) - 1));
+
+            for (int i = 0; i < tempLength; i++)
+            {
+                context.Destination.Add(context.Source[context.ReferenceIndex + i]);
+            }
+
+            context.ReferenceIndex += tempLength;
+        }
+    }
+
+    private static void ProcessEndOfFile(ref EncodingContext context)
+    {
+        context.Destination.Add((byte)(0xFC + context.Run)); // End-of-stream command + 0..3 literal
+
+        if (context.Run <= 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < context.Run; i++)
+        {
+            context.Destination.Add(context.Source[context.ReferenceIndex + i]);
+        }
+    }
+
+    private void TraverseMainLoop(ref EncodingContext context)
+    {
+        while (context.LoopLength >= 0)
+        {
+            InitializeTraversal(ref context);
+            ProcessLargeHashOffset(ref context);
+            if (context.BinaryCost >= context.BinaryLength || context.LoopLength < 4)
+            {
+                ProcessLargeCost(ref context);
             }
             else
             {
-                AddToHashTable(ref context, context.InputPosition);
-                context.InputPosition++;
-                context.LiteralRunLength++;
+                ProcessCostRelatedLiteralData(ref context);
+                ProcessCostRelatedFormData(ref context);
+                if (context.Run > 0)
+                {
+                    ProcessCostRelatedLiteralRun(ref context);
+                }
+
+                if (QuickEncoding)
+                {
+                    ProcessQuickEncoding(ref context);
+                }
+                else
+                {
+                    ProcessSlowEncoding(ref context);
+                }
+
+                context.CurrentIndex += context.BinaryLength;
+                context.ReferenceIndex = context.CurrentIndex;
+                context.LoopLength -= context.BinaryLength;
             }
         }
+    }
 
-        // Handle remaining data as literals
-        context.LiteralRunLength += context.Source.Length - context.InputPosition;
-        FlushLiteralRuns(ref context);
-        WriteEndOfStream(ref context);
+    private void TraverseFile(ref EncodingContext context)
+    {
+        TraverseMainLoop(ref context);
+        TraverseSecondaryLoop(ref context);
+        ProcessEndOfFile(ref context);
     }
 
     #endregion
 
-    #region Decoding Support
+    #region Decoding Utilities
 
-    private struct DecodeContext()
+    private struct DecodingContext()
     {
         public byte[] Source { get; init; }
+        public int SourceIndex { get; set; }
         public List<byte> Destination { get; } = [];
-        public int ExpectedOutputSize { get; init; }
-        public int InputPosition { get; set; }
-        public int OutputPosition { get; set; }
-        public byte CurrentCommand { get; set; }
+        public byte First { get; set; }
+        public byte Second { get; set; }
+        public byte Third { get; set; }
+        public byte Fourth { get; set; }
+        public uint Run { get; set; }
     }
 
-    private static void InitializeDecodeContext(ref DecodeContext context)
+    private static void PopulateDestinationSize(ref DecodingContext context)
     {
-        var headerType = context.Source.AsSpan().GetBigEndianValue(2);
-        var uses4ByteSize = (headerType & 0x8000) != 0;
-        var hasSkipField = (headerType & 0x0100) != 0;
-        var sizeFieldBytes = uses4ByteSize ? 4 : 3;
-        var skipFieldBytes = hasSkipField ? sizeFieldBytes : 0;
+        int unpackedLength;
+        uint type = context.Source[context.SourceIndex++];
+        type = (type << 8) + context.Source[context.SourceIndex++];
 
-        context.InputPosition = 2 + skipFieldBytes + sizeFieldBytes;
-        context.OutputPosition = 0;
-
-        ArgumentOutOfRangeException.ThrowIfLessThan(context.Source.Length, context.InputPosition);
-
-        // It will probably be this large if nothing goes wrong.
-        context.Destination.Capacity = context.ExpectedOutputSize;
-    }
-
-    private static void CopyLiteralBytes(ref DecodeContext context, int byteCount)
-    {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(
-            context.InputPosition + byteCount,
-            context.Source.Length
-        );
-
-        var sourceData = context.Source.AsSpan().Slice(context.InputPosition, byteCount);
-        context.Destination.AddRange(sourceData);
-        context.InputPosition += byteCount;
-        context.OutputPosition += byteCount;
-    }
-
-    private static void CopyMatchBytes(ref DecodeContext context, int rawDistance, int matchLength)
-    {
-        ArgumentOutOfRangeException.ThrowIfZero(context.OutputPosition);
-        ArgumentOutOfRangeException.ThrowIfLessThanOrEqual(context.OutputPosition, rawDistance);
-
-        var referencePosition = context.OutputPosition - 1 - rawDistance;
-        var sourceData = context.Source.AsSpan().Slice(referencePosition, matchLength);
-        context.Destination.AddRange(sourceData);
-        context.OutputPosition += matchLength;
-    }
-
-    private static void ProcessShortCommand(ref DecodeContext context)
-    {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(
-            context.InputPosition + 1,
-            context.Source.Length
-        );
-
-        var secondByte = context.Source[context.InputPosition++];
-        var literalCount = context.CurrentCommand & 0x03;
-        var rawDistance = ((context.CurrentCommand & 0x60) << 3) + secondByte;
-        var matchLength = ((context.CurrentCommand & 0x1C) >> 2) + 3;
-
-        CopyLiteralBytes(ref context, literalCount);
-        CopyMatchBytes(ref context, rawDistance, matchLength);
-    }
-
-    private static void ProcessIntermediateCommand(ref DecodeContext context)
-    {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(
-            context.InputPosition + 2,
-            context.Source.Length
-        );
-
-        var secondByte = context.Source[context.InputPosition++];
-        var thirdByte = context.Source[context.InputPosition++];
-        var literalCount = secondByte >> 6;
-        var rawDistance = ((secondByte & 0x3F) << 8) + thirdByte;
-        var matchLength = (context.CurrentCommand & 0x3F) + 4;
-
-        CopyLiteralBytes(ref context, literalCount);
-        CopyMatchBytes(ref context, rawDistance, matchLength);
-    }
-
-    private static void ProcessLongCommand(ref DecodeContext context)
-    {
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(
-            context.InputPosition + 3,
-            context.Source.Length
-        );
-
-        var secondByte = context.Source[context.InputPosition++];
-        var thirdByte = context.Source[context.InputPosition++];
-        var fourthByte = context.Source[context.InputPosition++];
-        var literalCount = context.CurrentCommand & 0x03;
-        var rawDistance =
-            (((context.CurrentCommand & 0x10) >> 4) << 16) + (secondByte << 8) + thirdByte;
-
-        var matchLength = (((context.CurrentCommand & 0x0C) >> 2) << 8) + fourthByte + 5;
-
-        CopyLiteralBytes(ref context, literalCount);
-        CopyMatchBytes(ref context, rawDistance, matchLength);
-    }
-
-    private static bool ProcessLiteralCommand(ref DecodeContext context)
-    {
-        var runLength = ((context.CurrentCommand & 0x1F) << 2) + 4;
-        if (runLength <= 112)
+        if ((type & 0x8000) != 0)
         {
-            // Regular literal block
-            CopyLiteralBytes(ref context, runLength);
-            return false; // Continue processing
+            if ((type & 0x100) != 0)
+            {
+                context.SourceIndex += 4;
+            }
+
+            unpackedLength = context.Source[context.SourceIndex++];
+            unpackedLength = (unpackedLength << 8) + context.Source[context.SourceIndex++];
+        }
+        else
+        {
+            if ((type & 0x100) != 0)
+            {
+                context.SourceIndex += 3;
+            }
+
+            unpackedLength = context.Source[context.SourceIndex++];
         }
 
-        // End of stream with optional literal bytes
-        var finalLiterals = context.CurrentCommand & 0x03;
-        if (finalLiterals > 0)
-        {
-            CopyLiteralBytes(ref context, finalLiterals);
-        }
+        unpackedLength = (unpackedLength << 8) + context.Source[context.SourceIndex++];
+        unpackedLength = (unpackedLength << 8) + context.Source[context.SourceIndex++];
 
-        return true; // End of stream reached
+        context.Destination.Capacity = unpackedLength;
     }
 
-    private static void ProcessCompressionStream(ref DecodeContext context)
+    private static bool ProcessShortForm(ref DecodingContext context)
     {
-        while (context.InputPosition < context.Source.Length)
+        if ((context.First & 0x80) != 0)
         {
-            context.CurrentCommand = context.Source[context.InputPosition++];
-            if ((context.CurrentCommand & 0x80) == 0)
+            return false;
+        }
+
+        context.Second = context.Source[context.SourceIndex++];
+        context.Run = (uint)(context.First & 3);
+        while (context.Run-- != 0)
+        {
+            context.Destination.Add(context.Source[context.SourceIndex++]);
+        }
+
+        var referenceOffset =
+            context.Destination.Count - 1 - (((context.First & 0x60) << 3) + context.Second);
+
+        context.Run = (uint)(((context.First & 0x1C) >> 2) + 3 - 1);
+
+        for (var i = 0U; i <= context.Run; i++)
+        {
+            context.Destination.Add(context.Destination[(int)(referenceOffset + i)]);
+        }
+
+        return true;
+    }
+
+    private static bool ProcessIntForm(ref DecodingContext context)
+    {
+        if ((context.First & 0x40) != 0)
+        {
+            return false;
+        }
+
+        context.Second = context.Source[context.SourceIndex++];
+        context.Third = context.Source[context.SourceIndex++];
+        context.Run = (uint)(context.Second >> 6);
+        while (context.Run-- != 0)
+        {
+            context.Destination.Add(context.Source[context.SourceIndex++]);
+        }
+
+        var referenceOffset =
+            context.Destination.Count - 1 - (((context.Second & 0x3F) << 8) + context.Third);
+
+        context.Run = (uint)((context.First & 0x3F) + 4 - 1);
+
+        for (var i = 0U; i <= context.Run; i++)
+        {
+            context.Destination.Add(context.Destination[(int)(referenceOffset + i)]);
+        }
+
+        return true;
+    }
+
+    private static bool ProcessVeryIntForm(ref DecodingContext context)
+    {
+        if ((context.First & 0x20) != 0)
+        {
+            return false;
+        }
+
+        context.Second = context.Source[context.SourceIndex++];
+        context.Third = context.Source[context.SourceIndex++];
+        context.Fourth = context.Source[context.SourceIndex++];
+        context.Run = (uint)(context.First & 3);
+        while (context.Run-- != 0)
+        {
+            context.Destination.Add(context.Source[context.SourceIndex++]);
+        }
+
+        var referenceOffset =
+            context.Destination.Count
+            - 1
+            - (((context.First & 0x10) >> 4 << 16) + (context.Second << 8) + context.Third);
+
+        context.Run = (uint)(((context.First & 0x0C) >> 2 << 8) + context.Fourth + 5 - 1);
+
+        for (var i = 0U; i <= context.Run; i++)
+        {
+            context.Destination.Add(context.Destination[(int)(referenceOffset + i)]);
+        }
+
+        return true;
+    }
+
+    private static bool ProcessLiteral(ref DecodingContext context)
+    {
+        context.Run = (uint)(((context.First & 0x1F) << 2) + 4);
+        if (context.Run > 112)
+        {
+            return false;
+        }
+
+        while (context.Run-- != 0)
+        {
+            context.Destination.Add(context.Source[context.SourceIndex++]);
+        }
+
+        return true;
+    }
+
+    private static void ProcessEofLiteral(ref DecodingContext context)
+    {
+        context.Run = (uint)(context.First & 3);
+        while (context.Run-- != 0)
+        {
+            context.Destination.Add(context.Source[context.SourceIndex++]);
+        }
+    }
+
+    private static void TraverseFile(ref DecodingContext context)
+    {
+        while (true)
+        {
+            context.First = context.Source[context.SourceIndex++];
+            if (ProcessShortForm(ref context))
             {
-                ProcessShortCommand(ref context);
+                continue;
             }
-            else if ((context.CurrentCommand & 0x40) == 0)
+
+            if (ProcessIntForm(ref context))
             {
-                ProcessIntermediateCommand(ref context);
+                continue;
             }
-            else if ((context.CurrentCommand & 0x20) == 0)
+
+            if (ProcessVeryIntForm(ref context))
             {
-                ProcessLongCommand(ref context);
+                continue;
             }
-            else
+
+            if (ProcessLiteral(ref context))
             {
-                if (ProcessLiteralCommand(ref context))
-                {
-                    break; // End of stream reached
-                }
+                continue;
             }
+
+            ProcessEofLiteral(ref context);
+            break;
         }
     }
 

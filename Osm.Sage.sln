@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Eac", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DFF7EA29-EFA1-4920-A6CC-144747BC362A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Eac.Tests", "Tests\Osm.Sage.Compression.Eac.Tests\Osm.Sage.Compression.Eac.Tests.csproj", "{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Tests", "Tests\Osm.Sage.Compression.Tests\Osm.Sage.Compression.Tests.csproj", "{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
