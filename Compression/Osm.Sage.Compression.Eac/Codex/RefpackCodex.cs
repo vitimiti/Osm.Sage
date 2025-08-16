@@ -98,12 +98,12 @@ public partial class RefpackCodex : ICodex
     /// Encodes (compresses) the provided uncompressed data using the Refpack compression algorithm.
     /// </summary>
     /// <param name="uncompressedData">The uncompressed data to encode.</param>
-    /// <returns>A collection of bytes representing the Refpack compressed data.</returns>
+    /// <returns>An array of bytes representing the Refpack compressed data.</returns>
     /// <remarks>
     /// The encoding process uses a hash table and sliding window approach to find repeated data patterns.
     /// The compression efficiency can be controlled using the <see cref="QuickEncoding"/> property.
     /// </remarks>
-    public ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData)
+    public byte[] Encode(ReadOnlySpan<byte> uncompressedData)
     {
         EncodingContext context = new()
         {
@@ -121,20 +121,20 @@ public partial class RefpackCodex : ICodex
 
         TraverseFile(ref context);
 
-        return context.Destination;
+        return context.Destination.ToArray();
     }
 
     /// <summary>
     /// Decodes (decompresses) the provided Refpack compressed data.
     /// </summary>
     /// <param name="compressedData">The Refpack compressed data to decode.</param>
-    /// <returns>A collection of bytes representing the uncompressed data.</returns>
+    /// <returns>An array of bytes representing the uncompressed data.</returns>
     /// <exception cref="ArgumentException">Thrown when the compressed data is not valid Refpack data.</exception>
     /// <remarks>
     /// The decoding process interprets various command forms in the compressed data:
     /// short form, int form, very int form, literals, and end-of-file markers.
     /// </remarks>
-    public ICollection<byte> Decode(ReadOnlySpan<byte> compressedData)
+    public byte[] Decode(ReadOnlySpan<byte> compressedData)
     {
         if (!IsValid(compressedData))
         {
@@ -152,6 +152,6 @@ public partial class RefpackCodex : ICodex
         PopulateDestinationSize(ref context);
         TraverseFile(ref context);
 
-        return context.Destination;
+        return context.Destination.ToArray();
     }
 }

@@ -81,8 +81,8 @@ public partial class BinaryTreeCodex : ICodex
     /// Compresses the provided uncompressed data using the binary tree algorithm.
     /// </summary>
     /// <param name="uncompressedData">The data to compress.</param>
-    /// <returns>A collection containing the compressed data.</returns>
-    public ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData)
+    /// <returns>An array containing the compressed data.</returns>
+    public byte[] Encode(ReadOnlySpan<byte> uncompressedData)
     {
         var context = new BTreeEncodeContext
         {
@@ -95,15 +95,15 @@ public partial class BinaryTreeCodex : ICodex
         };
 
         InitializeMasks(ref context);
-        return CompressFile(ref context);
+        return CompressFile(ref context).ToArray();
     }
 
     /// <summary>
     /// Decompresses the provided compressed data encoded using the binary tree algorithm.
     /// </summary>
     /// <param name="compressedData">The compressed data to decompress.</param>
-    /// <returns>A collection containing the original uncompressed data.</returns>
-    public ICollection<byte> Decode(ReadOnlySpan<byte> compressedData)
+    /// <returns>An array containing the original uncompressed data.</returns>
+    public byte[] Decode(ReadOnlySpan<byte> compressedData)
     {
         if (!IsValid(compressedData))
         {
@@ -120,6 +120,6 @@ public partial class BinaryTreeCodex : ICodex
         ProcessNodes(ref context);
         TraverseFile(ref context);
 
-        return context.Destination;
+        return context.Destination.ToArray();
     }
 }

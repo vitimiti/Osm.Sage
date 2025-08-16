@@ -20,8 +20,14 @@ public partial class HuffmanWithRunlengthCodex : ICodex
             LongType = "Huffman",
         };
 
-    public bool IsValid(ReadOnlySpan<byte> compressedData) =>
-        BinaryPrimitives.ReadUInt16BigEndian(compressedData)
+    public bool IsValid(ReadOnlySpan<byte> compressedData)
+    {
+        if (compressedData.Length < 2)
+        {
+            return false;
+        }
+
+        return BinaryPrimitives.ReadUInt16BigEndian(compressedData)
             is 0x30FB
                 or 0x31FB
                 or 0x32FB
@@ -34,6 +40,7 @@ public partial class HuffmanWithRunlengthCodex : ICodex
                 or 0xB3FB
                 or 0xB4FB
                 or 0xB5FB;
+    }
 
     public int ExtractSize(ReadOnlySpan<byte> compressedData)
     {
@@ -64,12 +71,12 @@ public partial class HuffmanWithRunlengthCodex : ICodex
         };
     }
 
-    public ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData)
+    public byte[] Encode(ReadOnlySpan<byte> uncompressedData)
     {
         throw new NotImplementedException();
     }
 
-    public ICollection<byte> Decode(ReadOnlySpan<byte> compressedData)
+    public byte[] Decode(ReadOnlySpan<byte> compressedData)
     {
         throw new NotImplementedException();
     }

@@ -44,15 +44,15 @@ public class Signature
     /// <summary>
     /// Converts the signature value back to its byte representation.
     /// </summary>
-    /// <returns>A read-only collection containing the 4 bytes of the signature in big-endian order.</returns>
+    /// <returns>An array containing the 4 bytes of the signature in big-endian order.</returns>
     /// <remarks>
     /// The returned bytes represent the signature value as it would appear in binary data,
     /// with the most significant byte first (big-endian format).
     /// </remarks>
-    public IReadOnlyCollection<byte> ToBytes()
+    public byte[] ToBytes()
     {
-        Span<byte> valueBytes = stackalloc byte[4];
+        var valueBytes = new byte[4];
         BinaryPrimitives.WriteUInt32BigEndian(valueBytes, Value);
-        return valueBytes.ToArray();
+        return valueBytes;
     }
 }

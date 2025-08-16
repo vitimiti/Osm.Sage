@@ -32,16 +32,16 @@ public interface ICodex
     /// Encodes (compresses) the provided uncompressed data using this codec's compression algorithm.
     /// </summary>
     /// <param name="uncompressedData">The uncompressed data to encode.</param>
-    /// <returns>A collection of bytes representing the compressed data.</returns>
+    /// <returns>An array of bytes representing the compressed data.</returns>
     /// <exception cref="NotSupportedException">Thrown when this codec does not support encoding operations.</exception>
-    ICollection<byte> Encode(ReadOnlySpan<byte> uncompressedData);
+    byte[] Encode(ReadOnlySpan<byte> uncompressedData);
 
     /// <summary>
     /// Decodes (decompresses) the provided compressed data using this codec's decompression algorithm.
     /// </summary>
     /// <param name="compressedData">The compressed data to decode.</param>
-    /// <returns>A collection of bytes representing the uncompressed data.</returns>
+    /// <returns>An array of bytes representing the uncompressed data.</returns>
     /// <exception cref="ArgumentException">Thrown when the compressed data is invalid or corrupted.</exception>
     /// <exception cref="NotSupportedException">Thrown when this codec does not support decoding operations.</exception>
-    ICollection<byte> Decode(ReadOnlySpan<byte> compressedData);
+    byte[] Decode(ReadOnlySpan<byte> compressedData);
 }
