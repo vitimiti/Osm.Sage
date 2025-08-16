@@ -7,6 +7,26 @@
     <IsTestProject>true</IsTestProject>
     <RootNamespace>Osm.Sage.Compression.Eac.Tests</RootNamespace>
   </PropertyGroup>
+  <Choose>
+    <When Condition="'$(Configuration)' == 'Debug'">
+      <PropertyGroup>
+        <DefineDebug>true</DefineDebug>
+        <DebugSymbols>true</DebugSymbols>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <Optimize>false</Optimize>
+        <DebugType>portable</DebugType>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup>
+        <DefineDebug>false</DefineDebug>
+        <DebugSymbols>false</DebugSymbols>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
@@ -25,5 +45,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj" />
   </ItemGroup>
-  <Import Project="$(SolutionDir)\Targets\Osm.Sage.Common.targets" />
 </Project>
