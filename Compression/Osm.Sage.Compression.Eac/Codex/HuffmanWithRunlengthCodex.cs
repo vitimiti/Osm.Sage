@@ -73,16 +73,4 @@ public partial class HuffmanWithRunlengthCodex : ICodex
     {
         throw new NotImplementedException();
     }
-
-    #region Encoding Utilities
-
-    // Nothing here, yet
-
-    #endregion
-
-    #region Decoding Utilities
-
-    // Nothing here, yet
-
-    #endregion
 }
