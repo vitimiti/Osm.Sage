@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DFF7EA29
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Tests", "Tests\Osm.Sage.Compression.Tests\Osm.Sage.Compression.Tests.csproj", "{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.LightZhl", "Compression\Osm.Sage.Compression.LightZhl\Osm.Sage.Compression.LightZhl.csproj", "{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,9 +36,14 @@ Global
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61E00E66-4339-4A68-88A9-3B1BDB1E4910} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E} = {DFF7EA29-EFA1-4920-A6CC-144747BC362A}
+		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 	EndGlobalSection
 EndGlobal
