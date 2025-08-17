@@ -1,10 +1,14 @@
 using System.Buffers.Binary;
+using JetBrains.Annotations;
 using Osm.Sage.Gimex;
 
 namespace Osm.Sage.Compression.Eac.Codex;
 
+[PublicAPI]
 public partial class HuffmanWithRunlengthCodex : ICodex
 {
+    private int _deltaRuns;
+
     public CodexInformation About =>
         new()
         {
@@ -19,6 +23,12 @@ public partial class HuffmanWithRunlengthCodex : ICodex
             ShortType = "huff",
             LongType = "Huffman",
         };
+
+    public int DeltaRuns
+    {
+        get => _deltaRuns;
+        set => _deltaRuns = int.Clamp(value, 0, 2);
+    }
 
     public bool IsValid(ReadOnlySpan<byte> compressedData)
     {
@@ -73,11 +83,39 @@ public partial class HuffmanWithRunlengthCodex : ICodex
 
     public byte[] Encode(ReadOnlySpan<byte> uncompressedData)
     {
-        throw new NotImplementedException();
+        EncodingContext context = new();
+        var src = uncompressedData.ToArray();
+        switch (DeltaRuns)
+        {
+            case 1:
+                src = DeltaOnce(src);
+                break;
+            case 2:
+                src = DeltaOnce(src);
+                src = DeltaOnce(src);
+                break;
+        }
+
+        context.Buffer = src;
+        context.FLength = src.Length;
+        context.ULength = (uint)src.Length;
+
+        MemStruct outFile = new();
+        PackFile(ref context, src, ref outFile, context.FLength, DeltaRuns);
+
+        return outFile.Buffer.ToArray();
     }
 
     public byte[] Decode(ReadOnlySpan<byte> compressedData)
     {
+        if (!IsValid(compressedData))
+        {
+            throw new ArgumentException(
+                $"The data is not a valid {nameof(HuffmanWithRunlengthCodex)}",
+                nameof(compressedData)
+            );
+        }
+
         throw new NotImplementedException();
     }
 }

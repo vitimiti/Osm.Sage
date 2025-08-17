@@ -89,17 +89,15 @@ public class ArbitraryDataTests
     )
     {
         HuffmanWithRunlengthCodex codex = new();
-        // var compressedData = codex.Encode(originalData).ToArray();
+        var compressedData = codex.Encode(originalData).ToArray();
         // var decompressedData = codex.Decode(compressedData).ToArray();
 
         // Basic checks
-        // Assert.True(codex.IsValid(compressedData));
-        Assert.True(codex.IsValid(expectedCompressedData));
-        // Assert.Equal(originalData.Length, codex.ExtractSize(compressedData));
-        Assert.Equal(originalData.Length, codex.ExtractSize(expectedCompressedData));
+        Assert.True(codex.IsValid(compressedData));
+        Assert.Equal(originalData.Length, codex.ExtractSize(compressedData));
 
         // Compare the compressed data
-        // Assert.Equal(expectedCompressedData, compressedData);
+        Assert.Equal(expectedCompressedData, compressedData);
 
         // Compare the decompressed data
         // Assert.Equal(originalData, decompressedData);
