@@ -116,6 +116,6 @@ public partial class HuffmanWithRunlengthCodex : ICodex
             );
         }
 
-        throw new NotImplementedException();
+        return Decompress(compressedData).ToArray();
     }
 }

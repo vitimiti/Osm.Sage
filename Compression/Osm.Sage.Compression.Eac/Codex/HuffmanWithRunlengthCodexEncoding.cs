@@ -1,8 +1,5 @@
 namespace Osm.Sage.Compression.Eac.Codex;
 
-/// <summary>
-///
-/// </summary>
 public partial class HuffmanWithRunlengthCodex
 {
     private const int BigNum = 32000;
