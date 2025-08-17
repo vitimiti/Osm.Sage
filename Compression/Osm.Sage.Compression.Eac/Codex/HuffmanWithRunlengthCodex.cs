@@ -4,11 +4,18 @@ using Osm.Sage.Gimex;
 
 namespace Osm.Sage.Compression.Eac.Codex;
 
+/// <summary>
+/// Implements a Huffman-with-run-length compression codec.
+/// Provides methods to validate data, extract the uncompressed size, and perform encoding/decoding.
+/// </summary>
 [PublicAPI]
 public partial class HuffmanWithRunlengthCodex : ICodex
 {
     private int _deltaRuns;
 
+    /// <summary>
+    /// Gets information about this codec, including signature, capabilities, version, and type descriptors.
+    /// </summary>
     public CodexInformation About =>
         new()
         {
@@ -24,12 +31,23 @@ public partial class HuffmanWithRunlengthCodex : ICodex
             LongType = "Huffman",
         };
 
+    /// <summary>
+    /// Gets or sets the number of delta pre-processing passes applied before encoding.
+    /// </summary>
+    /// <remarks>
+    /// The value is clamped to the range [0, 2]. Delta passes are only applied during <see cref="Encode(ReadOnlySpan{byte})"/>.
+    /// </remarks>
     public int DeltaRuns
     {
         get => _deltaRuns;
         set => _deltaRuns = int.Clamp(value, 0, 2);
     }
 
+    /// <summary>
+    /// Validates whether the provided data is in a supported Huffman-with-run-length compressed format.
+    /// </summary>
+    /// <param name="compressedData">The compressed data to validate.</param>
+    /// <returns><c>true</c> if the data header matches a supported format; otherwise, <c>false</c>.</returns>
     public bool IsValid(ReadOnlySpan<byte> compressedData)
     {
         if (compressedData.Length < 2)
@@ -52,6 +70,13 @@ public partial class HuffmanWithRunlengthCodex : ICodex
                 or 0xB5FB;
     }
 
+    /// <summary>
+    /// Extracts the size of the original uncompressed data from the compressed data header.
+    /// </summary>
+    /// <param name="compressedData">The compressed data containing the size information.</param>
+    /// <returns>The size in bytes of the uncompressed data.</returns>
+    /// <exception cref="ArgumentException">Thrown when the data is not recognized as valid for this codec.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the buffer is too short to contain the required header fields.</exception>
     public int ExtractSize(ReadOnlySpan<byte> compressedData)
     {
         if (!IsValid(compressedData))
@@ -81,6 +106,14 @@ public partial class HuffmanWithRunlengthCodex : ICodex
         };
     }
 
+    /// <summary>
+    /// Encodes (compresses) the provided uncompressed data using the Huffman-with-run-length algorithm.
+    /// </summary>
+    /// <param name="uncompressedData">The uncompressed data to encode.</param>
+    /// <returns>An array containing the compressed data.</returns>
+    /// <remarks>
+    /// Depending on <see cref="DeltaRuns"/>, 0–2 delta passes may be applied before compression to improve ratio.
+    /// </remarks>
     public byte[] Encode(ReadOnlySpan<byte> uncompressedData)
     {
         EncodingContext context = new();
@@ -106,6 +139,12 @@ public partial class HuffmanWithRunlengthCodex : ICodex
         return outFile.Buffer.ToArray();
     }
 
+    /// <summary>
+    /// Decodes (decompresses) the provided Huffman-with-run-length compressed data.
+    /// </summary>
+    /// <param name="compressedData">The compressed data to decode.</param>
+    /// <returns>An array containing the uncompressed data.</returns>
+    /// <exception cref="ArgumentException">Thrown when the data is not recognized as valid for this codec.</exception>
     public byte[] Decode(ReadOnlySpan<byte> compressedData)
     {
         if (!IsValid(compressedData))
