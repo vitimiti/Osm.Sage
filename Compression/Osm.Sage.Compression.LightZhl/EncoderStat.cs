@@ -13,7 +13,9 @@ public class EncoderStat : HuffStat
         public ushort Code { get; set; }
     }
 
-    public static Symbol[] SymbolTable0 { get; } =
+    public int NextStat { get; set; } = Globals.HuffRecalcLen;
+
+    public Symbol[] SymbolTable { get; } =
     [
         new() { NBits = 7, Code = 0x0014 },
         new() { NBits = 8, Code = 0x0030 },
@@ -290,9 +292,6 @@ public class EncoderStat : HuffStat
         new() { NBits = 9, Code = 0x01FC },
         new() { NBits = 9, Code = 0x01FD },
     ];
-
-    public int NextStat { get; set; } = Globals.HuffRecalcLen;
-    public Symbol[] SymbolTable { get; set; } = new Symbol[Globals.HufSymbols];
 
     public void CalcStat(Span<int> groups)
     {
