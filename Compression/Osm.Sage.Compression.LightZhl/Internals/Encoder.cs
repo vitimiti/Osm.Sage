@@ -3,7 +3,7 @@ using MatchOverItem = (int Symbol, int NBits, ushort Bits);
 
 namespace Osm.Sage.Compression.LightZhl.Internals;
 
-internal class Encoder(EncoderStat stat, byte[] dest)
+internal class Encoder(EncoderStat stat)
 {
     public const int MaxMatchOver = 517;
     public const int MaxRaw = 64;
@@ -11,11 +11,10 @@ internal class Encoder(EncoderStat stat, byte[] dest)
     private readonly short[] _sStat = stat.Stat;
 
     private int _nextStat = stat.NextStat;
-    private int _destIndex;
     private int _bits;
     private int _nBits;
 
-    public static int CalcMaxBuf(int rawSize) => rawSize + (rawSize >> 1) + 32;
+    public List<byte> Dest { get; } = [];
 
     public void PutRaw(ReadOnlySpan<byte> source)
     {
@@ -111,7 +110,7 @@ internal class Encoder(EncoderStat stat, byte[] dest)
         Put(Globals.HufSymbols - 1);
         while (_nBits > 0)
         {
-            dest[_destIndex++] = (byte)(_bits >> 24);
+            Dest.Add((byte)(_bits >> 24));
             _nBits -= 8;
             _bits <<= 8;
         }
@@ -127,8 +126,8 @@ internal class Encoder(EncoderStat stat, byte[] dest)
             return;
         }
 
-        dest[_destIndex++] = (byte)(_bits >> 24);
-        dest[_destIndex++] = (byte)(_bits >> 16);
+        Dest.Add((byte)(_bits >> 24));
+        Dest.Add((byte)(_bits >> 16));
         _nBits -= 16;
         _bits <<= 16;
     }
@@ -145,10 +144,16 @@ internal class Encoder(EncoderStat stat, byte[] dest)
         for (var i = 0; i < 16; ++i)
         {
             var nBits = groups[i];
-            ArgumentOutOfRangeException.ThrowIfLessThan(nBits, lastNBits);
+
+            ArgumentOutOfRangeException.ThrowIfLessThan(nBits, 0);
             ArgumentOutOfRangeException.ThrowIfGreaterThan(nBits, 8);
-            var delta = nBits = lastNBits;
+            ArgumentOutOfRangeException.ThrowIfLessThan(nBits, lastNBits);
+
+            var delta = nBits - lastNBits;
             lastNBits = nBits;
+
+            // Match the original: write (delta+1) bits with code=1
+            // This encodes as (delta zeros) followed by a single one: 0...01
             PutBits(delta + 1, 1);
         }
     }
@@ -172,7 +177,8 @@ internal class Encoder(EncoderStat stat, byte[] dest)
     private void Put(ushort symbol, int codeBits, uint code)
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(symbol, Globals.HufSymbols);
-        ArgumentOutOfRangeException.ThrowIfLessThan(codeBits, 4);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(codeBits, 4);
+        ArgumentOutOfRangeException.ThrowIfLessThan(codeBits, 0);
         if (--_nextStat <= 0)
         {
             CallStat();

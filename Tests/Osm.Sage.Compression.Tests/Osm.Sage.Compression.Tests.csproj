@@ -44,5 +44,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj" />
+    <ProjectReference Include="..\..\Compression\Osm.Sage.Compression.LightZhl\Osm.Sage.Compression.LightZhl.csproj" />
   </ItemGroup>
 </Project>

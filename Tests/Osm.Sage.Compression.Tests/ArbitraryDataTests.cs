@@ -1,4 +1,5 @@
 using Osm.Sage.Compression.Eac.Codex;
+using Osm.Sage.Compression.LightZhl;
 
 namespace Osm.Sage.Compression.Eac.Tests;
 
@@ -35,6 +36,17 @@ public class ArbitraryDataTests
             { CommonData.LoremIpsumLong, HuffmanWithRunlengthData.LoremIpsumLong },
             { CommonData.LoremIpsumVeryLong, HuffmanWithRunlengthData.LoremIpsumVeryLong },
             { CommonData.LoremIpsumRepetitive, HuffmanWithRunlengthData.LoremIpsumRepetitive },
+        };
+
+    public static TheoryData<byte[], byte[]> LightZhlTestData =>
+        new()
+        {
+            { CommonData.Empty, LightZhlData.Empty },
+            { CommonData.SingleByte, LightZhlData.SingleByte },
+            { CommonData.LoremIpsumShort, LightZhlData.LoremIpsumShort },
+            { CommonData.LoremIpsumLong, LightZhlData.LoremIpsumLong },
+            { CommonData.LoremIpsumVeryLong, LightZhlData.LoremIpsumVeryLong },
+            { CommonData.LoremIpsumRepetitive, LightZhlData.LoremIpsumRepetitive },
         };
 
     [Theory]
@@ -101,5 +113,18 @@ public class ArbitraryDataTests
 
         // Compare the decompressed data
         Assert.Equal(originalData, decompressedData);
+    }
+
+    [Theory]
+    [MemberData(nameof(LightZhlTestData))]
+    public void LightZhl_EncodesAndDecodesCorrectly(
+        byte[] originalData,
+        byte[] expectedCompressedData
+    )
+    {
+        Compressor compressor = new();
+
+        var compressed = compressor.Compress(originalData);
+        Assert.Equal(expectedCompressedData, compressed);
     }
 }

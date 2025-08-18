@@ -1,6 +1,10 @@
-namespace Osm.Sage.Compression.LightZhl.Internals;
+using JetBrains.Annotations;
+using Osm.Sage.Compression.LightZhl.Internals;
 
-internal class Buffer
+namespace Osm.Sage.Compression.LightZhl;
+
+[PublicAPI]
+public class Buffer
 {
     protected byte[] Buf { get; } = new byte[Globals.BufSize];
     protected uint BufPos { get; private set; } = 0;
@@ -63,6 +67,8 @@ internal class Buffer
         var second = FirstMismatch(Buf.AsSpan(0, remaining), p[first..], remaining);
         return first + second;
     }
+
+    protected void Rewind(uint n) => BufPos -= n;
 
     private static int FirstMismatch(ReadOnlySpan<byte> a, ReadOnlySpan<byte> b, int len)
     {
