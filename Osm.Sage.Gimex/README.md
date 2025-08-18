@@ -17,6 +17,12 @@ This library is simply a collection of utilities.
 
 ## Signature
 
-This class is used to generate a signature for a given string in big-endian format.
+This class is used to generate a 4-byte signature for a given string in big-endian format. For example:
 
-Used in the EAC compression library to generate a signature for the EAC formats information.
+```csharp
+var signature = new Signature("ref");
+Console.WriteLine($"0x{signature.Value:X8}"); // 0x52454620
+```
+
+Any signature longer than four bytes will be truncated without warning or errors. Any signature shorter than four bytes
+will be left-padded with zeroes due to the big-endian format.

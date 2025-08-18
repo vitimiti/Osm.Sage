@@ -3,6 +3,14 @@ using JetBrains.Annotations;
 
 namespace Osm.Sage.Compression.LightZhl.Exceptions;
 
+/// <summary>
+/// Represents an exception that occurs during the decoding process in the compression algorithm.
+/// </summary>
+/// <remarks>
+/// This exception provides detailed context regarding the decoding failure, including the specific
+/// stage of the process, bit-level details, and buffer positions. It is primarily used to propagate
+/// errors discovered during decompression workflows.
+/// </remarks>
 [PublicAPI]
 public class DecodingException : InvalidDataContractException
 {

@@ -3,6 +3,11 @@ using Osm.Sage.Compression.LightZhl.Internals;
 
 namespace Osm.Sage.Compression.LightZhl;
 
+/// <summary>
+/// Represents a decoder statistics class used for Huffman compression-based decoding operations.
+/// This class provides internal structures and methods necessary for decoding tasks, including
+/// symbol and group table management, and sorting temporary statistics during decoding.
+/// </summary>
 [PublicAPI]
 public class DecoderStat : IHuffStat
 {
@@ -12,6 +17,13 @@ public class DecoderStat : IHuffStat
         public int Pos { get; set; }
     }
 
+    /// <summary>
+    /// Represents a collection of statistical data used for decoding operations
+    /// in Huffman compression. This property stores an array of short integer values
+    /// corresponding to the frequency or occurrence of specific symbols during the decoding process.
+    /// It is utilized to update and recalculate symbol statistics dynamically during
+    /// runtime operations.
+    /// </summary>
     public short[] Stat { get; } = new short[Globals.HufSymbols];
 
     // csharpier-ignore
@@ -42,6 +54,11 @@ public class DecoderStat : IHuffStat
         249, 250, 251, 252, 253, 254, 272, 273,
     ];
 
+    /// <summary>
+    /// Processes Huffman statistics, updates their values, sorts them, and calculates the total.
+    /// </summary>
+    /// <param name="s">A span of temporary Huffman statistic structures to be sorted and processed.</param>
+    /// <returns>The total of the statistics before updating their values.</returns>
     public int MakeSortedTmp(Span<HuffStatTmpStruct> s)
     {
         var total = 0;

@@ -4,6 +4,19 @@ using Osm.Sage.Compression.LightZhl.Internals;
 
 namespace Osm.Sage.Compression.LightZhl;
 
+/// <summary>
+/// The Decompressor class is responsible for decompressing data using a custom LightZhl compression algorithm.
+/// This class extends the functionality of the <see cref="Buffer"/> class to manage decompression involving
+/// circular sliding buffer operations.
+/// </summary>
+/// <remarks>
+/// The Decompressor class uses a combination of Huffman decoding, group and symbol management, and
+/// displacement/length decoding to reconstruct the original data from compressed data. The decompression
+/// process involves reading symbols and groups, updating statistical occurrences, and handling various
+/// stages of decoding, including end-of-stream and literal cases. The final output is captured in a growing
+/// buffer to accommodate variable decompression sizes.
+/// </remarks>
+/// <seealso cref="Buffer"/>
 [PublicAPI]
 public class Decompressor : Buffer
 {
@@ -16,8 +29,6 @@ public class Decompressor : Buffer
         ReadSymbol,
         RecalcTables,
         DecodeMatchOver,
-        DecodeDisplacement,
-        CopyMatch,
         EndOfStream,
     }
 
@@ -35,6 +46,12 @@ public class Decompressor : Buffer
     private static (int nBits, int disp)[] DispTable =>
         [(0, 0), (0, 1), (1, 2), (2, 4), (3, 8), (4, 16), (5, 32), (6, 64)];
 
+    /// <summary>
+    /// Decompresses the given input data represented by a read-only span of bytes.
+    /// </summary>
+    /// <param name="source">The compressed data to be decompressed.</param>
+    /// <returns>A list of bytes representing the decompressed data.</returns>
+    /// <exception cref="DecodingException">Thrown when there is an error during the decompression process.</exception>
     public List<byte> Decompress(ReadOnlySpan<byte> source)
     {
         var output = new List<byte>(source.Length * 2); // heuristic; will grow as needed
