@@ -15,6 +15,8 @@ internal class Encoder(EncoderStat stat, byte[] dest)
     private int _bits;
     private int _nBits;
 
+    public static int CalcMaxBuf(int rawSize) => rawSize + (rawSize >> 1) + 32;
+
     public void PutRaw(ReadOnlySpan<byte> source)
     {
         foreach (var b in source)
