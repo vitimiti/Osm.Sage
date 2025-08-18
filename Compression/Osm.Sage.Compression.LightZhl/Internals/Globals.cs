@@ -6,6 +6,7 @@ internal static class Globals
     public const int HuffRecalcLen = 4096;
     public const int BufBits = 16;
     public const int BufSize = 1 << BufBits;
+    public const int BufMask = BufSize - 1;
 
     public static short RecalcStat(short s) => (short)(s >> 1);
 }
