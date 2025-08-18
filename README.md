@@ -28,10 +28,10 @@ possible to maintain the compatibility as a secondary happenstance.
 
 ## Libraries
 
-- [Osm.Sage.Gimex](./Osm.Sage.Gimex/README.md) - No dependencies
-- [Osm.Sage.Compression.Eac](./Compression/Osm.Sage.Compression.Eac/README.md) - Depends on:
-    - [Osm.Sage.Gimex](./Osm.Sage.Gimex/README.md)
-- [Osm.Sage.Compression.LightZhl](./Compression/Osm.Sage.Compression.LightZhl/README.md) - No dependencies
+- [Osm.Sage.Gimex](./Sources/Osm.Sage.Gimex/README.md) - No dependencies
+- [Osm.Sage.Compression.Eac](./Sources/Compression/Osm.Sage.Compression.Eac/README.md) - Depends on:
+    - [Osm.Sage.Gimex](./Sources/Osm.Sage.Gimex/README.md)
+- [Osm.Sage.Compression.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md) - No dependencies
 
 ---
 

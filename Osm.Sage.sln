@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Gimex", "Osm.Sage.Gimex\Osm.Sage.Gimex.csproj", "{F0F158CB-EDB1-46CD-855C-43505E758899}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Compression", "Compression", "{545FD09C-01EC-43ED-B8DF-E906E5384BF8}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Eac", "Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj", "{61E00E66-4339-4A68-88A9-3B1BDB1E4910}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{DFF7EA29-EFA1-4920-A6CC-144747BC362A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Tests", "Tests\Osm.Sage.Compression.Tests\Osm.Sage.Compression.Tests.csproj", "{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.LightZhl", "Compression\Osm.Sage.Compression.LightZhl\Osm.Sage.Compression.LightZhl.csproj", "{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Gimex", "Sources\Osm.Sage.Gimex\Osm.Sage.Gimex.csproj", "{6A3A5BB9-B8BA-4064-A6CD-92BD462DBC4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.Eac", "Sources\Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj", "{57F44FBB-26F9-4A73-8716-31CE86375941}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression.LightZhl", "Sources\Compression\Osm.Sage.Compression.LightZhl\Osm.Sage.Compression.LightZhl.csproj", "{19D8712E-EA14-47D5-9971-86E0CF127337}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,26 +24,26 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{F0F158CB-EDB1-46CD-855C-43505E758899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F0F158CB-EDB1-46CD-855C-43505E758899}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F0F158CB-EDB1-46CD-855C-43505E758899}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F0F158CB-EDB1-46CD-855C-43505E758899}.Release|Any CPU.Build.0 = Release|Any CPU
-		{61E00E66-4339-4A68-88A9-3B1BDB1E4910}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{61E00E66-4339-4A68-88A9-3B1BDB1E4910}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{61E00E66-4339-4A68-88A9-3B1BDB1E4910}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{61E00E66-4339-4A68-88A9-3B1BDB1E4910}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A3A5BB9-B8BA-4064-A6CD-92BD462DBC4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A3A5BB9-B8BA-4064-A6CD-92BD462DBC4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A3A5BB9-B8BA-4064-A6CD-92BD462DBC4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A3A5BB9-B8BA-4064-A6CD-92BD462DBC4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57F44FBB-26F9-4A73-8716-31CE86375941}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57F44FBB-26F9-4A73-8716-31CE86375941}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57F44FBB-26F9-4A73-8716-31CE86375941}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57F44FBB-26F9-4A73-8716-31CE86375941}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19D8712E-EA14-47D5-9971-86E0CF127337}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19D8712E-EA14-47D5-9971-86E0CF127337}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19D8712E-EA14-47D5-9971-86E0CF127337}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19D8712E-EA14-47D5-9971-86E0CF127337}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{61E00E66-4339-4A68-88A9-3B1BDB1E4910} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E} = {DFF7EA29-EFA1-4920-A6CC-144747BC362A}
-		{73DF46B7-437D-42D6-88B1-F6D613A2C0C0} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
+		{57F44FBB-26F9-4A73-8716-31CE86375941} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
+		{19D8712E-EA14-47D5-9971-86E0CF127337} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 	EndGlobalSection
 EndGlobal
