@@ -1,4 +1,4 @@
-namespace Osm.Sage.Compression.LightZhl;
+namespace Osm.Sage.Compression.LightZhl.Internals;
 
 internal static class Globals
 {

@@ -1,11 +1,9 @@
-using JetBrains.Annotations;
 using DispItem = (int NBits, ushort Bits);
 using MatchOverItem = (int Symbol, int NBits, ushort Bits);
 
-namespace Osm.Sage.Compression.LightZhl;
+namespace Osm.Sage.Compression.LightZhl.Internals;
 
-[PublicAPI]
-public class Encoder(EncoderStat stat, byte[] dest)
+internal class Encoder(EncoderStat stat, byte[] dest)
 {
     public const int MaxMatchOver = 517;
     public const int MaxRaw = 64;

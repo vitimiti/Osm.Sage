@@ -1,13 +1,10 @@
 using System.Numerics;
-using JetBrains.Annotations;
 
-namespace Osm.Sage.Compression.LightZhl;
+namespace Osm.Sage.Compression.LightZhl.Internals;
 
-[PublicAPI]
-public class EncoderStat : HuffStat
+internal class EncoderStat : HuffStat
 {
-    [PublicAPI]
-    public struct Symbol
+    internal struct Symbol
     {
         public short NBits { get; set; }
         public ushort Code { get; set; }
