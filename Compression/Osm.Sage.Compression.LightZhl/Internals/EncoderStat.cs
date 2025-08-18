@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Osm.Sage.Compression.LightZhl.Internals;
 
-internal class EncoderStat : HuffStat
+internal class EncoderStat : IHuffStat
 {
     internal struct Symbol
     {
@@ -10,7 +10,9 @@ internal class EncoderStat : HuffStat
         public ushort Code { get; set; }
     }
 
-    public int NextStat { get; set; } = Globals.HuffRecalcLen;
+    public short[] Stat { get; } = new short[Globals.HufSymbols];
+
+    public int NextStat { get; private set; } = Globals.HuffRecalcLen;
 
     // csharpier-ignore
     public Symbol[] SymbolTable { get; } =
@@ -109,6 +111,21 @@ internal class EncoderStat : HuffStat
         new() { NBits = 9, Code = 0x01FD },
     ];
 
+    public int MakeSortedTmp(Span<HuffStatTmpStruct> s)
+    {
+        var total = 0;
+        for (short j = 0; j < Globals.HufSymbols; ++j)
+        {
+            s[j].I = j;
+            s[j].N = Stat[j];
+            total += Stat[j];
+            Stat[j] = Globals.RecalcStat(Stat[j]);
+        }
+
+        ShellSort(s, Globals.HufSymbols);
+        return total;
+    }
+
     public void CalcStat(Span<int> groups)
     {
         var s = new HuffStatTmpStruct[Globals.HufSymbols];
@@ -132,6 +149,29 @@ internal class EncoderStat : HuffStat
         AddGroup(groups, 15, bestNBits15);
 
         FillSymbolTable(s, groups, bestNBits);
+    }
+
+    private static void ShellSort(Span<HuffStatTmpStruct> a, int n)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(n / 9, 13);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(n / 9, 40);
+
+        for (var h = 40; h > 0; h /= 3)
+        {
+            for (var i = h + 1; i <= n; ++i)
+            {
+                var v = a[i];
+                var j = i;
+
+                while ((j >= h) && (v < a[j - h]))
+                {
+                    a[j] = a[j - h];
+                    j -= h;
+                }
+
+                a[j] = v;
+            }
+        }
     }
 
     private static void AddGroup(Span<int> groups, int group, int nBits)

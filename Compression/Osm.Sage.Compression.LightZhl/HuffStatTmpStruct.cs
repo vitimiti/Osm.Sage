@@ -1,8 +1,10 @@
 using System.Diagnostics.CodeAnalysis;
+using JetBrains.Annotations;
 
-namespace Osm.Sage.Compression.LightZhl.Internals;
+namespace Osm.Sage.Compression.LightZhl;
 
-internal struct HuffStatTmpStruct : IComparable<HuffStatTmpStruct>, IComparable
+[PublicAPI]
+public struct HuffStatTmpStruct : IComparable<HuffStatTmpStruct>, IComparable
 {
     public short I { get; set; }
     public short N { get; set; }

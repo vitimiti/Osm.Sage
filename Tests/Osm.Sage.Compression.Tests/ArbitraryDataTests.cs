@@ -126,5 +126,10 @@ public class ArbitraryDataTests
 
         var compressed = compressor.Compress(originalData);
         Assert.Equal(expectedCompressedData, compressed);
+
+        Decompressor decompressor = new();
+
+        var decompressed = decompressor.Decompress(compressed.ToArray());
+        Assert.Equal(originalData, decompressed);
     }
 }

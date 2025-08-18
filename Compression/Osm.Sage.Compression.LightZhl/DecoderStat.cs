@@ -1,6 +1,10 @@
-namespace Osm.Sage.Compression.LightZhl.Internals;
+using JetBrains.Annotations;
+using Osm.Sage.Compression.LightZhl.Internals;
 
-internal class DecoderStat : HuffStat
+namespace Osm.Sage.Compression.LightZhl;
+
+[PublicAPI]
+public class DecoderStat : IHuffStat
 {
     internal struct Group
     {
@@ -8,8 +12,10 @@ internal class DecoderStat : HuffStat
         public int Pos { get; set; }
     }
 
+    public short[] Stat { get; } = new short[Globals.HufSymbols];
+
     // csharpier-ignore
-    public Group[] GroupTable { get; } =
+    internal Group[] GroupTable { get; } =
     [
         new() { NBits = 2, Pos = 0 }, new() { NBits = 3, Pos = 4 }, new() { NBits = 3, Pos = 12 },
         new() { NBits = 4, Pos = 20 }, new() { NBits = 4, Pos = 36 }, new() { NBits = 4, Pos = 52 },
@@ -20,7 +26,7 @@ internal class DecoderStat : HuffStat
     ];
 
     // csharpier-ignore
-    public short[] SymbolTable { get; } =
+    internal short[] SymbolTable { get; } =
     [
         256, 257, 258, 259, 260, 261, 262, 263, 264, 265, 266, 267, 268, 269, 270, 271, 0, 32, 48, 255, 1, 2, 3, 4, 5,
         6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 33, 34, 35,
@@ -35,4 +41,42 @@ internal class DecoderStat : HuffStat
         227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248,
         249, 250, 251, 252, 253, 254, 272, 273,
     ];
+
+    public int MakeSortedTmp(Span<HuffStatTmpStruct> s)
+    {
+        var total = 0;
+        for (short j = 0; j < Globals.HufSymbols; ++j)
+        {
+            s[j].I = j;
+            s[j].N = Stat[j];
+            total += Stat[j];
+            Stat[j] = Globals.RecalcStat(Stat[j]);
+        }
+
+        ShellSort(s, Globals.HufSymbols);
+        return total;
+    }
+
+    private static void ShellSort(Span<HuffStatTmpStruct> a, int n)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(n / 9, 13);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(n / 9, 40);
+
+        for (var h = 40; h > 0; h /= 3)
+        {
+            for (var i = h + 1; i <= n; ++i)
+            {
+                var v = a[i];
+                var j = i;
+
+                while ((j >= h) && (v < a[j - h]))
+                {
+                    a[j] = a[j - h];
+                    j -= h;
+                }
+
+                a[j] = v;
+            }
+        }
+    }
 }
