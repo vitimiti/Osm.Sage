@@ -1,5 +1,8 @@
+using JetBrains.Annotations;
+
 namespace Osm.Sage.Compression.LightZhl;
 
+[PublicAPI]
 public class HuffStat
 {
     public short[] Stat { get; } = new short[Globals.HufSymbols];
