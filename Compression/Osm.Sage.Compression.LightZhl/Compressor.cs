@@ -4,6 +4,14 @@ using Osm.Sage.Compression.LightZhl.Options;
 
 namespace Osm.Sage.Compression.LightZhl;
 
+/// <summary>
+/// LightZhl compression encoder that operates on a sliding window and emits a compressed byte stream.
+/// </summary>
+/// <remarks>
+/// This encoder is designed for high-speed LZ-style matching with optional features such as lazy matching,
+/// overlapping copies, backward extension, and a tunable hashing strategy. Use <see cref="CompressionOptions"/>
+/// to adjust compression behavior and trade-offs between speed and ratio.
+/// </remarks>
 [PublicAPI]
 public class Compressor : Buffer
 {
@@ -93,8 +101,29 @@ public class Compressor : Buffer
     private readonly EncoderStat _stat = new();
     private readonly ushort[] _table = new ushort[Globals.TableSize];
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Compressor"/> class.
+    /// </summary>
+    /// <remarks>
+    /// The internal hash table is pre-filled with sentinel values to indicate that no prior positions are recorded.
+    /// </remarks>
     public Compressor() => Array.Fill(_table, unchecked((ushort)-1));
 
+    /// <summary>
+    /// Compresses the provided source buffer using the LightZhl encoder.
+    /// </summary>
+    /// <param name="source">The input data to compress.</param>
+    /// <param name="options">
+    /// An optional delegate used to configure <see cref="CompressionOptions"/> for this operation.
+    /// If <c>null</c>, default options are used.
+    /// </param>
+    /// <returns>
+    /// A list containing the encoded bytes of the compressed stream.
+    /// </returns>
+    /// <remarks>
+    /// The returned list grows as needed to hold the output. The method processes the input in-place
+    /// without allocating an additional full-size copy of the source.
+    /// </remarks>
     public List<byte> Compress(
         ReadOnlySpan<byte> source,
         Action<CompressionOptions>? options = null
