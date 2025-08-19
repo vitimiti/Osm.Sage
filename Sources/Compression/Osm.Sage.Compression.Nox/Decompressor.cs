@@ -12,6 +12,7 @@ public static class Decompressor
 
     public static Memory<byte> DecompressMemory(ReadOnlyMemory<byte> input)
     {
-        throw new NotImplementedException();
+        LightZhl.Decompressor decompressor = new();
+        return new Memory<byte>(decompressor.Decompress(input.Span).ToArray());
     }
 }

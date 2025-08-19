@@ -12,6 +12,7 @@ public static class Compressor
 
     public static Memory<byte> CompressMemory(ReadOnlyMemory<byte> input)
     {
-        throw new NotImplementedException();
+        LightZhl.Compressor compressor = new();
+        return new Memory<byte>(compressor.Compress(input.Span).ToArray());
     }
 }
