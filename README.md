@@ -6,6 +6,11 @@ The OSM-SAGE (Open Source and Modernized SAGE) engine implementation.
 >
 > This project is under construction.
 
+> <span style="color: yellow;">Disclaimer:</span>
+>
+> This project is currently using AI generated XML docs and these will eventually be replaced with hand-written docs.
+> I honestly don't know if they are absolutely correct until I actually rewrite them.
+
 All code aims to be as faithful as possible to the original SAGE engine, but using dotnet. This does NOT, however, mean
 that the engine aims to be online-play compatible with the original games. Memory related bugs and instability should be
 removed within this project. Old bugs should be removed as well.
@@ -32,6 +37,8 @@ possible to maintain the compatibility as a secondary happenstance.
 - [Osm.Sage.Compression.Eac](./Sources/Compression/Osm.Sage.Compression.Eac/README.md) - Depends on:
     - [Osm.Sage.Gimex](./Sources/Osm.Sage.Gimex/README.md)
 - [Osm.Sage.Compression.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md) - No dependencies
+- [Osm.Sage.Compression.Nox](./Sources/Compression/Osm.Sage.Compression.Nox/README.md) - Depends on:
+  - [Osm.Sage.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md)
 
 ---
 
