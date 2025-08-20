@@ -43,9 +43,7 @@
     <Using Include="Xunit" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Sources\Compression\Osm.Sage.Compression.Eac\Osm.Sage.Compression.Eac.csproj" />
-    <ProjectReference Include="..\..\Sources\Compression\Osm.Sage.Compression.LightZhl\Osm.Sage.Compression.LightZhl.csproj" />
-    <ProjectReference Include="..\..\Sources\Compression\Osm.Sage.Compression.Nox\Osm.Sage.Compression.Nox.csproj" />
+    <ProjectReference Include="..\..\Sources\Compression\Osm.Sage.Compression\Osm.Sage.Compression.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Data\EmptyData.txt">

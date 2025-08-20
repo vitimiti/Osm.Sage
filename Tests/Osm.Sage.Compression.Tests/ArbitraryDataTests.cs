@@ -48,56 +48,49 @@ public class ArbitraryDataTests
             { CommonData.LoremIpsumRepetitive, LightZhlData.LoremIpsumRepetitive },
         };
 
-    public static TheoryData<byte[], byte[]> NoxTestData =>
-        new()
-        {
-            { CommonData.Empty, NoxData.Empty },
-            { CommonData.SingleByte, NoxData.SingleByte },
-            { CommonData.LoremIpsumShort, NoxData.LoremIpsumShort },
-            { CommonData.LoremIpsumLong, NoxData.LoremIpsumLong },
-            { CommonData.LoremIpsumVeryLong, NoxData.LoremIpsumVeryLong },
-            { CommonData.LoremIpsumRepetitive, NoxData.LoremIpsumRepetitive },
-        };
-
+    // csharpier-ignore
     public static TheoryData<string, string, string, byte[]> NoxFileTestData =>
         new()
         {
-            {
-                "Data/EmptyData.txt",
-                "Data/EmptyData.bin",
-                "Data/EmptyDataDecompressed.txt",
-                NoxData.Empty
-            },
-            {
-                "Data/SingleByteData.txt",
-                "Data/SingleByteData.bin",
-                "Data/SingleByteDataDecompressed.txt",
-                NoxData.SingleByte
-            },
-            {
-                "Data/LoremIpsumShort.txt",
-                "Data/LoremIpsumShort.bin",
-                "Data/LoremIpsumShort.txt",
-                NoxData.LoremIpsumShort
-            },
-            {
-                "Data/LoremIpsumLong.txt",
-                "Data/LoremIpsumLong.bin",
-                "Data/LoremIpsumLong.txt",
-                NoxData.LoremIpsumLong
-            },
-            {
-                "Data/LoremIpsumVeryLong.txt",
-                "Data/LoremIpsumVeryLong.bin",
-                "Data/LoremIpsumVeryLong.txt",
-                NoxData.LoremIpsumVeryLong
-            },
-            {
-                "Data/LoremIpsumRepetitive.txt",
-                "Data/LoremIpsumRepetitive.bin",
-                "Data/LoremIpsumRepetitive.txt",
-                NoxData.LoremIpsumRepetitive
-            },
+            { "Data/EmptyData.txt", "Data/EmptyData.bin", "Data/EmptyDataDecompressed.txt", LightZhlData.Empty },
+            { "Data/SingleByteData.txt", "Data/SingleByteData.bin", "Data/SingleByteDataDecompressed.txt", LightZhlData.SingleByte },
+            { "Data/LoremIpsumShort.txt", "Data/LoremIpsumShort.bin", "Data/LoremIpsumShort.txt", LightZhlData.LoremIpsumShort },
+            { "Data/LoremIpsumLong.txt", "Data/LoremIpsumLong.bin", "Data/LoremIpsumLong.txt", LightZhlData.LoremIpsumLong },
+            { "Data/LoremIpsumVeryLong.txt", "Data/LoremIpsumVeryLong.bin", "Data/LoremIpsumVeryLong.txt", LightZhlData.LoremIpsumVeryLong },
+            { "Data/LoremIpsumRepetitive.txt", "Data/LoremIpsumRepetitive.bin", "Data/LoremIpsumRepetitive.txt", LightZhlData.LoremIpsumRepetitive },
+        };
+
+    // csharpier-ignore
+    public static TheoryData<CompressionType, byte[], byte[]> MainCompressionTestData =>
+        new()
+        {
+            { CompressionType.BinaryTree, CommonData.Empty, CompressedData.BinaryTree.Empty },
+            { CompressionType.BinaryTree, CommonData.SingleByte, CompressedData.BinaryTree.SingleByte },
+            { CompressionType.BinaryTree, CommonData.LoremIpsumShort, CompressedData.BinaryTree.LoremIpsumShort },
+            { CompressionType.BinaryTree, CommonData.LoremIpsumLong, CompressedData.BinaryTree.LoremIpsumLong },
+            { CompressionType.BinaryTree, CommonData.LoremIpsumVeryLong, CompressedData.BinaryTree.LoremIpsumVeryLong },
+            { CompressionType.BinaryTree, CommonData.LoremIpsumRepetitive, CompressedData.BinaryTree.LoremIpsumRepetitive },
+            { CompressionType.HuffmanWithRunlength, CommonData.Empty, CompressedData.HuffmanWithRunLength.Empty },
+            { CompressionType.HuffmanWithRunlength, CommonData.SingleByte, CompressedData.HuffmanWithRunLength.SingleByte },
+            { CompressionType.HuffmanWithRunlength, CommonData.LoremIpsumShort, CompressedData.HuffmanWithRunLength.LoremIpsumShort },
+            { CompressionType.HuffmanWithRunlength, CommonData.LoremIpsumLong, CompressedData.HuffmanWithRunLength.LoremIpsumLong },
+            { CompressionType.HuffmanWithRunlength, CommonData.LoremIpsumVeryLong, CompressedData.HuffmanWithRunLength.LoremIpsumVeryLong },
+            { CompressionType.HuffmanWithRunlength, CommonData.LoremIpsumRepetitive, CompressedData.HuffmanWithRunLength.LoremIpsumRepetitive },
+            { CompressionType.Refpack, CommonData.Empty, CompressedData.Refpack.Empty },
+            { CompressionType.Refpack, CommonData.SingleByte, CompressedData.Refpack.SingleByte },
+            { CompressionType.Refpack, CommonData.LoremIpsumShort, CompressedData.Refpack.LoremIpsumShort },
+            { CompressionType.Refpack, CommonData.LoremIpsumLong, CompressedData.Refpack.LoremIpsumLong },
+            { CompressionType.Refpack, CommonData.LoremIpsumVeryLong, CompressedData.Refpack.LoremIpsumVeryLong },
+            { CompressionType.Refpack, CommonData.LoremIpsumRepetitive, CompressedData.Refpack.LoremIpsumRepetitive },
+            { CompressionType.NoxLzh, CommonData.Empty, CompressedData.NoxLzh.Empty },
+            { CompressionType.NoxLzh, CommonData.SingleByte, CompressedData.NoxLzh.SingleByte },
+            { CompressionType.NoxLzh, CommonData.LoremIpsumShort, CompressedData.NoxLzh.LoremIpsumShort },
+            { CompressionType.NoxLzh, CommonData.LoremIpsumLong, CompressedData.NoxLzh.LoremIpsumLong },
+            { CompressionType.NoxLzh, CommonData.LoremIpsumVeryLong, CompressedData.NoxLzh.LoremIpsumVeryLong },
+            { CompressionType.NoxLzh, CommonData.LoremIpsumRepetitive, CompressedData.NoxLzh.LoremIpsumRepetitive },
+            // Maybe test ZLib?
+            // It's not like I am making this algorithm, it comes from the
+            // official .NET ZLib implementation.
         };
 
     [Theory]
@@ -185,7 +178,7 @@ public class ArbitraryDataTests
     }
 
     [Theory]
-    [MemberData(nameof(NoxTestData))]
+    [MemberData(nameof(LightZhlTestData))]
     public void Nox_EncodesAndDecodesMemoryCorrectly(
         byte[] originalData,
         byte[] expectedCompressedData
@@ -218,5 +211,20 @@ public class ArbitraryDataTests
         Nox.Decompressor.DecompressFile(expectedCompressedFilePath, decompressedFilePath);
         var decompressed = File.ReadAllBytes(decompressedFilePath);
         Assert.Equal(originalData, decompressed);
+    }
+
+    [Theory]
+    [MemberData(nameof(MainCompressionTestData))]
+    public void MainCompression_EncodesAndDecodesCorrectly(
+        CompressionType compressionType,
+        byte[] originalData,
+        byte[] expectedCompressedData
+    )
+    {
+        var compressed = CompressionManager.Compress(compressionType, originalData);
+        Assert.Equal(expectedCompressedData, compressed);
+
+        var uncompressed = CompressionManager.Decompress(compressed);
+        Assert.Equal(originalData, uncompressed);
     }
 }

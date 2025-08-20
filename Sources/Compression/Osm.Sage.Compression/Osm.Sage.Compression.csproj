@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>The main compression library for the Osm.Sage engine.</Description>
-    <Version>0.1.0-alpha</Version>
+    <Version>1.0.0-beta</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(ProjectDir)\README.md" Pack="true" PackagePath="docs\README.md" />
