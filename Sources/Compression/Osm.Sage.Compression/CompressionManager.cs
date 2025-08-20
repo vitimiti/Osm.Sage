@@ -6,12 +6,31 @@ using Osm.Sage.Compression.Nox;
 
 namespace Osm.Sage.Compression;
 
+/// <summary>
+/// High-level utilities to detect, compress and decompress buffers using multiple formats.
+/// </summary>
 [PublicAPI]
 public static class CompressionManager
 {
+    /// <summary>
+    /// Determines whether the provided buffer appears to be compressed in a supported format.
+    /// </summary>
+    /// <param name="data">The buffer to inspect.</param>
+    /// <returns>
+    /// <see langword="true"/> if <see cref="GetCompressionType(System.ReadOnlySpan{byte})"/> detects a known
+    /// compression header; otherwise, <see langword="false"/>.
+    /// </returns>
     public static bool IsCompressed(ReadOnlySpan<byte> data) =>
         GetCompressionType(data) is not CompressionType.None;
 
+    /// <summary>
+    /// Detects the compression type of the given buffer based on its 4-byte magic.
+    /// </summary>
+    /// <param name="data">The buffer to inspect. Only the first 4–8 bytes are required.</param>
+    /// <returns>
+    /// A <see cref="CompressionType"/> value indicating the detected format, or
+    /// <see cref="CompressionType.None"/> if the buffer does not match a supported header.
+    /// </returns>
     public static CompressionType GetCompressionType(ReadOnlySpan<byte> data)
     {
         if (data.Length < 8)
@@ -44,6 +63,18 @@ public static class CompressionManager
         };
     }
 
+    /// <summary>
+    /// Compresses the provided data using the specified compression type and writes a common 8-byte header.
+    /// </summary>
+    /// <param name="compressionType">The compression algorithm to use.</param>
+    /// <param name="data">The input data to compress.</param>
+    /// <returns>
+    /// A new byte array containing:
+    /// - 4-byte magic identifying the algorithm,
+    /// - 4-byte big-endian original length,
+    /// - followed by the algorithm-specific payload.
+    /// If the type is unsupported, the original data is returned unchanged.
+    /// </returns>
     public static byte[] Compress(CompressionType compressionType, ReadOnlySpan<byte> data)
     {
         switch (compressionType)
@@ -112,6 +143,15 @@ public static class CompressionManager
         return data.ToArray();
     }
 
+    /// <summary>
+    /// Decompresses a buffer that starts with a supported 8-byte header.
+    /// </summary>
+    /// <param name="data">
+    /// The buffer to decompress. It should begin with a 4-byte magic and a 4-byte big-endian original length.
+    /// </param>
+    /// <returns>
+    /// The decompressed data if the header indicates a supported format; otherwise, the original buffer is returned.
+    /// </returns>
     public static byte[] Decompress(ReadOnlySpan<byte> data)
     {
         var payload = data.Length > 8 ? data[8..] : ReadOnlySpan<byte>.Empty;

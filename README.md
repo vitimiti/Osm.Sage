@@ -39,6 +39,10 @@ possible to maintain the compatibility as a secondary happenstance.
 - [Osm.Sage.Compression.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md) - No dependencies
 - [Osm.Sage.Compression.Nox](./Sources/Compression/Osm.Sage.Compression.Nox/README.md) - Depends on:
   - [Osm.Sage.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md)
+- [Osm.Sage.Compression](./Sources/Compression/Osm.Sage.Compression/README.md) - Depends on:
+  - [Osm.Sage.Compression.Eac](./Sources/Compression/Osm.Sage.Compression.Eac/README.md)
+  - [Osm.Sage.Compression.LightZhl](./Sources/Compression/Osm.Sage.Compression.LightZhl/README.md)
+  - [Osm.Sage.Compression.Nox](./Sources/Compression/Osm.Sage.Compression.Nox/README.md)
 
 ---
 
