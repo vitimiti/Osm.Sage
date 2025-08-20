@@ -2,6 +2,12 @@
 
 This library is simply a wrapper around the `Osm.Sage.Compression.LightZhl` library.
 
+This library would originally be a private static library that was used by the SAGE library and was used as the actual
+Light ZHL library. Since the Light ZHL library in this project is a standalone library, this project instead is a
+wrapper for the `Osm.Sage.Compression.LightZhl` library.
+
+Like others, it has been made into a standalone library for easier maintenance.
+
 ---
 
 ## Table of Contents
@@ -26,6 +32,7 @@ Compressor.CompressFile("./decompressed.txt", "./compressed.txt");
 Memory<byte> data = // ...
 var compressed = Compressor.CompressMemory(data);
 ```
+
 ---
 
 ## Decompression
