@@ -1,5 +1,4 @@
 using Osm.Sage.Compression.Eac.Codex;
-using Osm.Sage.Compression.LightZhl;
 
 namespace Osm.Sage.Compression.Eac.Tests;
 
@@ -47,6 +46,58 @@ public class ArbitraryDataTests
             { CommonData.LoremIpsumLong, LightZhlData.LoremIpsumLong },
             { CommonData.LoremIpsumVeryLong, LightZhlData.LoremIpsumVeryLong },
             { CommonData.LoremIpsumRepetitive, LightZhlData.LoremIpsumRepetitive },
+        };
+
+    public static TheoryData<byte[], byte[]> NoxTestData =>
+        new()
+        {
+            { CommonData.Empty, NoxData.Empty },
+            { CommonData.SingleByte, NoxData.SingleByte },
+            { CommonData.LoremIpsumShort, NoxData.LoremIpsumShort },
+            { CommonData.LoremIpsumLong, NoxData.LoremIpsumLong },
+            { CommonData.LoremIpsumVeryLong, NoxData.LoremIpsumVeryLong },
+            { CommonData.LoremIpsumRepetitive, NoxData.LoremIpsumRepetitive },
+        };
+
+    public static TheoryData<string, string, string, byte[]> NoxFileTestData =>
+        new()
+        {
+            {
+                "Data/EmptyData.txt",
+                "Data/EmptyData.bin",
+                "Data/EmptyDataDecompressed.txt",
+                NoxData.Empty
+            },
+            {
+                "Data/SingleByteData.txt",
+                "Data/SingleByteData.bin",
+                "Data/SingleByteDataDecompressed.txt",
+                NoxData.SingleByte
+            },
+            {
+                "Data/LoremIpsumShort.txt",
+                "Data/LoremIpsumShort.bin",
+                "Data/LoremIpsumShort.txt",
+                NoxData.LoremIpsumShort
+            },
+            {
+                "Data/LoremIpsumLong.txt",
+                "Data/LoremIpsumLong.bin",
+                "Data/LoremIpsumLong.txt",
+                NoxData.LoremIpsumLong
+            },
+            {
+                "Data/LoremIpsumVeryLong.txt",
+                "Data/LoremIpsumVeryLong.bin",
+                "Data/LoremIpsumVeryLong.txt",
+                NoxData.LoremIpsumVeryLong
+            },
+            {
+                "Data/LoremIpsumRepetitive.txt",
+                "Data/LoremIpsumRepetitive.bin",
+                "Data/LoremIpsumRepetitive.txt",
+                NoxData.LoremIpsumRepetitive
+            },
         };
 
     [Theory]
@@ -122,14 +173,50 @@ public class ArbitraryDataTests
         byte[] expectedCompressedData
     )
     {
-        Compressor compressor = new();
+        LightZhl.Compressor compressor = new();
 
         var compressed = compressor.Compress(originalData);
         Assert.Equal(expectedCompressedData, compressed);
 
-        Decompressor decompressor = new();
+        LightZhl.Decompressor decompressor = new();
 
         var decompressed = decompressor.Decompress(compressed.ToArray());
+        Assert.Equal(originalData, decompressed);
+    }
+
+    [Theory]
+    [MemberData(nameof(NoxTestData))]
+    public void Nox_EncodesAndDecodesMemoryCorrectly(
+        byte[] originalData,
+        byte[] expectedCompressedData
+    )
+    {
+        ReadOnlyMemory<byte> originalMemory = new(originalData);
+
+        var compressed = Nox.Compressor.CompressMemory(originalMemory);
+        Assert.Equal(expectedCompressedData, compressed.ToArray());
+
+        var decompressed = Nox.Decompressor.DecompressMemory(compressed);
+        Assert.Equal(originalData, decompressed.ToArray());
+    }
+
+    [Theory]
+    [MemberData(nameof(NoxFileTestData))]
+    public void Nox_EncodesAndDecodesFileCorrectly(
+        string originalFilePath,
+        string expectedCompressedFilePath,
+        string decompressedFilePath,
+        byte[] expectedCompressedData
+    )
+    {
+        var originalData = File.ReadAllBytes(originalFilePath);
+
+        Nox.Compressor.CompressFile(originalFilePath, expectedCompressedFilePath);
+        var compressed = File.ReadAllBytes(expectedCompressedFilePath);
+        Assert.Equal(compressed, expectedCompressedData);
+
+        Nox.Decompressor.DecompressFile(expectedCompressedFilePath, decompressedFilePath);
+        var decompressed = File.ReadAllBytes(decompressedFilePath);
         Assert.Equal(originalData, decompressed);
     }
 }
