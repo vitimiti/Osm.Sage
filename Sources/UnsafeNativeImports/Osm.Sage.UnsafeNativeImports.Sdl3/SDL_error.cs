@@ -15,7 +15,7 @@ public static partial class SDL3
         StringMarshallingCustomType = typeof(Utf8StdioCompatibleStringMarshaller)
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetError(string message);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_OutOfMemory))]
@@ -33,6 +33,6 @@ public static partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ClearError))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ClearError();
 }

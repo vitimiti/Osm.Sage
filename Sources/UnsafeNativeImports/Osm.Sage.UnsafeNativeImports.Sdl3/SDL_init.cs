@@ -34,12 +34,12 @@ public static partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_Init))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_Init(SDL_InitFlags flags);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_InitSubSystem))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_InitSubSystem(SDL_InitFlags flags);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_QuitSubSystem))]
@@ -60,7 +60,7 @@ public static partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetAppMetadata(
         string? appname,
         string? appversion,
@@ -73,7 +73,7 @@ public static partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetAppMetadataProperty(string name, string? value);
 
     public const string SDL_PROP_APP_METADATA_NAME_STRING = "SDL.app.metadata.name";

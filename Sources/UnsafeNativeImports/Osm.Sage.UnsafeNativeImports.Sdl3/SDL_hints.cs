@@ -358,7 +358,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetHintWithPriority(
         string name,
         string? value,
@@ -371,7 +371,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetHint(string name, string? value);
 
     [LibraryImport(
@@ -380,7 +380,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ResetHint(string name);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ResetHints))]
@@ -402,7 +402,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_GetHintBoolean(
         string name,
         [MarshalAs(UnmanagedType.U1)] bool default_value
@@ -435,7 +435,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool INTERNAL_SDL_AddHintCallback(
         string name,
         delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, void> callback,

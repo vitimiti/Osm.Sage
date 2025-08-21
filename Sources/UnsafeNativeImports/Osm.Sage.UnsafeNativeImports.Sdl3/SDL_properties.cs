@@ -35,12 +35,12 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_CopyProperties))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_CopyProperties(SDL_PropertiesID src, SDL_PropertiesID dst);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_LockProperties))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_LockProperties(SDL_PropertiesID props);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_UnlockProperties))]
@@ -67,7 +67,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool INTERNAL_SDL_SetPointerPropertyWithCleanup(
         SDL_PropertiesID props,
         string name,
@@ -109,7 +109,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetPointerProperty(
         SDL_PropertiesID props,
         string name,
@@ -122,7 +122,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetStringProperty(
         SDL_PropertiesID props,
         string name,
@@ -135,7 +135,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetNumberProperty(
         SDL_PropertiesID props,
         string name,
@@ -148,7 +148,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetFloatProperty(
         SDL_PropertiesID props,
         string name,
@@ -161,7 +161,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_SetBooleanProperty(
         SDL_PropertiesID props,
         string name,
@@ -174,7 +174,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_HasProperty(SDL_PropertiesID props, string name);
 
     [LibraryImport(
@@ -240,7 +240,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_GetBooleanProperty(
         SDL_PropertiesID props,
         string name,
@@ -253,7 +253,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ClearProperty(SDL_PropertiesID props, string name);
 
     public delegate void SDL_EnumeratePropertiesCallback(SDL_PropertiesID props, string name);
@@ -279,7 +279,7 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_EnumerateProperties))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool INTERNAL_SDL_EnumerateProperties(
         SDL_PropertiesID props,
         delegate* unmanaged[Cdecl]<nint, SDL_PropertiesID, byte*, void> callback,

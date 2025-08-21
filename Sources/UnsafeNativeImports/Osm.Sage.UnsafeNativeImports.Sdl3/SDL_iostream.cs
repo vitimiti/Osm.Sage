@@ -82,7 +82,7 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_CloseIO))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool SDL_CloseIO(SDL_IOStream context);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_GetIOProperties))]
@@ -145,7 +145,7 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_FlushIO))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_FlushIO(SDL_IOStream context);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_LoadFile_IO))]
@@ -203,7 +203,7 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_SaveFile_IO))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool INTERNAL_SDL_SaveFile_IO(
         SDL_IOStream src,
         void* data,
@@ -231,7 +231,7 @@ public static unsafe partial class SDL3
         StringMarshalling = StringMarshalling.Utf8
     )]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     private static partial bool INTERNAL_SDL_SaveFile(string file, void* data, CULong datasize);
 
     public static bool SDL_SaveFile(string file, ReadOnlySpan<byte> data)
@@ -244,141 +244,141 @@ public static unsafe partial class SDL3
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU8))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU8(SDL_IOStream src, out byte value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS8))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS8(SDL_IOStream src, out sbyte value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU16LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU16LE(SDL_IOStream src, out ushort value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS16LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS16LE(SDL_IOStream src, out short value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU16BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU16BE(SDL_IOStream src, out ushort value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS16BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS16BE(SDL_IOStream src, out short value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU32LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU32LE(SDL_IOStream src, out uint value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS32LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS32LE(SDL_IOStream src, out int value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU32BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU32BE(SDL_IOStream src, out uint value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS32BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS32BE(SDL_IOStream src, out int value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU64LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU64LE(SDL_IOStream src, out ulong value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS64LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS64LE(SDL_IOStream src, out long value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadU64BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadU64BE(SDL_IOStream src, out ulong value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_ReadS64BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_ReadS64BE(SDL_IOStream src, out long value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU8))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU8(SDL_IOStream dst, byte value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS8))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS8(SDL_IOStream dst, sbyte value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU16LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU16LE(SDL_IOStream dst, ushort value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS16LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS16LE(SDL_IOStream dst, short value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU16BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU16BE(SDL_IOStream dst, ushort value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS16BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS16BE(SDL_IOStream dst, short value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU32LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU32LE(SDL_IOStream dst, uint value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS32LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS32LE(SDL_IOStream dst, int value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU32BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU32BE(SDL_IOStream dst, uint value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS32BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS32BE(SDL_IOStream dst, int value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU64LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU64LE(SDL_IOStream dst, ulong value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS64LE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS64LE(SDL_IOStream dst, long value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteU64BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteU64BE(SDL_IOStream dst, ulong value);
 
     [LibraryImport(nameof(SDL3), EntryPoint = nameof(SDL_WriteS64BE))]
     [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
-    [return: MarshalAs(UnmanagedType.U1)]
+    [return: MarshalAs(UnmanagedType.I4)]
     public static partial bool SDL_WriteS64BE(SDL_IOStream dst, long value);
 }
