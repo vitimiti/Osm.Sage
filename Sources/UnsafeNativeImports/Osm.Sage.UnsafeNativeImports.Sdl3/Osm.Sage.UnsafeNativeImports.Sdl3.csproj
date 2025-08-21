@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Description>The unsafe SDL3 native import library for the Osm.Sage engine.</Description>
-    <Version>0.8.0-alpha</Version>
+    <Version>0.9.0-alpha</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(ProjectDir)\README.md" Pack="true" PackagePath="docs\README.md" />
