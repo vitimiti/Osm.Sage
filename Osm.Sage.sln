@@ -21,6 +21,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.Compression", "Sou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.BrowserDispatch", "Osm.Sage.BrowserDispatch\Osm.Sage.BrowserDispatch.csproj", "{C36B6AF5-9751-47A9-8419-2A3C4A7DE3D3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnsafeNativeImports", "UnsafeNativeImports", "{E4ED2C5B-003F-483B-8362-C0A4712B8E20}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Osm.Sage.UnsafeNativeImports.Sdl3", "Sources\UnsafeNativeImports\Osm.Sage.UnsafeNativeImports.Sdl3\Osm.Sage.UnsafeNativeImports.Sdl3.csproj", "{81AC2A56-6654-488D-960A-E0AFFAB41BD5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +62,10 @@ Global
 		{C36B6AF5-9751-47A9-8419-2A3C4A7DE3D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C36B6AF5-9751-47A9-8419-2A3C4A7DE3D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C36B6AF5-9751-47A9-8419-2A3C4A7DE3D3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81AC2A56-6654-488D-960A-E0AFFAB41BD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81AC2A56-6654-488D-960A-E0AFFAB41BD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81AC2A56-6654-488D-960A-E0AFFAB41BD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81AC2A56-6654-488D-960A-E0AFFAB41BD5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BE470040-6A66-47C4-AF7A-6B572A1E7A4E} = {DFF7EA29-EFA1-4920-A6CC-144747BC362A}
@@ -65,5 +73,6 @@ Global
 		{19D8712E-EA14-47D5-9971-86E0CF127337} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 		{C156F0D1-0FE1-4F20-A276-A12E26A49AE6} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
 		{60A705F6-87D4-47C0-B9BE-9066F70D0390} = {545FD09C-01EC-43ED-B8DF-E906E5384BF8}
+		{81AC2A56-6654-488D-960A-E0AFFAB41BD5} = {E4ED2C5B-003F-483B-8362-C0A4712B8E20}
 	EndGlobalSection
 EndGlobal
