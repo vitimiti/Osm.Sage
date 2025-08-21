@@ -52,7 +52,7 @@ public static unsafe partial class SDL3
         string message
     );
 
-    private static delegate* unmanaged[Cdecl]<
+    private static readonly delegate* unmanaged[Cdecl]<
         nint,
         int,
         SDL_LogPriority,

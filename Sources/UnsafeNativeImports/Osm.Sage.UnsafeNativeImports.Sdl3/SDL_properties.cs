@@ -49,8 +49,10 @@ public static unsafe partial class SDL3
 
     public delegate void SDL_CleanupPropertyCallback(nint value);
 
-    private static delegate* unmanaged[Cdecl]<nint, nint, void> SDL_CleanupPropertyCallbackPtr =
-        &SDL_CleanupPropertyCallbackImpl;
+    private static readonly delegate* unmanaged[Cdecl]<
+        nint,
+        nint,
+        void> SDL_CleanupPropertyCallbackPtr = &SDL_CleanupPropertyCallbackImpl;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void SDL_CleanupPropertyCallbackImpl(nint value, nint userdata)
@@ -258,7 +260,7 @@ public static unsafe partial class SDL3
 
     public delegate void SDL_EnumeratePropertiesCallback(SDL_PropertiesID props, string name);
 
-    private static delegate* unmanaged[Cdecl]<
+    private static readonly delegate* unmanaged[Cdecl]<
         nint,
         SDL_PropertiesID,
         byte*,

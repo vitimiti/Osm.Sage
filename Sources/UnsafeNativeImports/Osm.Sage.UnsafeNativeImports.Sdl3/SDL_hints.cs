@@ -410,8 +410,12 @@ public static unsafe partial class SDL3
 
     public delegate void SDL_HintCallback(string name, string? oldValue, string? newValue);
 
-    private static delegate* unmanaged[Cdecl]<nint, byte*, byte*, byte*, void> SDL_HintCallbackPtr =
-        &SDL_HintCallbackImpl;
+    private static readonly delegate* unmanaged[Cdecl]<
+        nint,
+        byte*,
+        byte*,
+        byte*,
+        void> SDL_HintCallbackPtr = &SDL_HintCallbackImpl;
 
     [UnmanagedCallersOnly(CallConvs = [typeof(CallConvCdecl)])]
     private static void SDL_HintCallbackImpl(
