@@ -30,6 +30,11 @@ namespace Osm.Sage.UnsafeNativeImports.Sdl3;
 )]
 [SuppressMessage(
     "csharpsquid",
+    "S2342:Enumeration types should comply with a naming convention",
+    Justification = "SDL naming conventions."
+)]
+[SuppressMessage(
+    "csharpsquid",
     "S4200:Native methods should be wrapped",
     Justification = "SDL direct imports."
 )]
