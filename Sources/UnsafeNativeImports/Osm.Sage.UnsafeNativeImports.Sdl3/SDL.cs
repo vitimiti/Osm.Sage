@@ -19,9 +19,19 @@ namespace Osm.Sage.UnsafeNativeImports.Sdl3;
 /// </remarks>
 [PublicAPI]
 [SuppressMessage(
+    "Interoperability",
+    "CA1401:P/Invokes should not be visible",
+    Justification = "SDL direct imports."
+)]
+[SuppressMessage(
     "csharpsquid",
     "S101:Types should be named in PascalCase",
     Justification = "SDL naming conventions."
+)]
+[SuppressMessage(
+    "csharpsquid",
+    "S4200:Native methods should be wrapped",
+    Justification = "SDL direct imports."
 )]
 [SuppressMessage("ReSharper", "InconsistentNaming", Justification = "SDL naming conventions.")]
 public static partial class SDL3
